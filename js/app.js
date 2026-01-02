@@ -709,5 +709,99 @@ if (window.app) {
     window.getProductsByCategory = (category) => window.app.getProductsByCategory(category);
     window.getCategoryNameById = (categoryId) => window.app.getCategoryNameById(categoryId);
 }
+// ================ تحسينات إضافية للمنتجات والسلة ================
 
+// تحديث دالة initComponents لإضافة الكلاسات بشكل صحيح
+const originalInitComponents = NexusStore.prototype.initComponents;
+NexusStore.prototype.initComponents = async function() {
+    await originalInitComponents.call(this);
+    
+    // التأكد من أن جميع المديرين قد تم تحميلهم
+    console.log('🔄 Ensuring all managers are loaded...');
+    
+    // إضافة مستمعي الأحداث للمنتجات بعد تحميلها
+    setTimeout(() => {
+        this.addProductEventListeners();
+    }, 1000);
+};
+
+// تحديث دالة addProductEventListeners لتكون أكثر قوة
+NexusStore.prototype.addProductEventListeners = function() {
+    console.log('🎯 Adding product event listeners...');
+    
+    // أزرار إضافة إلى السلة
+    document.addEventListener('click', (e) => {
+        if (e.target.closest('.add-to-cart')) {
+            const button = e.target.closest('.add-to-cart');
+            const productId = button.dataset.id;
+            console.log('🛒 Add to cart clicked for:', productId);
+            
+            if (window.cartManager) {
+                window.cartManager.addToCart(productId);
+            } else {
+                console.error('❌ cartManager not available');
+            }
+            
+            e.preventDefault();
+            e.stopPropagation();
+        }
+        
+        // أزرار العرض السريع
+        if (e.target.closest('.quick-view')) {
+            const button = e.target.closest('.quick-view');
+            const productId = button.dataset.id;
+            console.log('👁️ Quick view clicked for:', productId);
+            
+            if (window.uiManager) {
+                window.uiManager.showProductQuickView(productId);
+            }
+            
+            e.preventDefault();
+            e.stopPropagation();
+        }
+        
+        // أزرار المفضلة
+        if (e.target.closest('.wishlist-btn')) {
+            const button = e.target.closest('.wishlist-btn');
+            const productId = button.dataset.id;
+            console.log('❤️ Wishlist clicked for:', productId);
+            
+            this.toggleWishlist(productId);
+            
+            e.preventDefault();
+            e.stopPropagation();
+        }
+    });
+    
+    // أضف مستمعي الأحداث للعروض الخاصة
+    const specialOffers = document.getElementById('special-offers');
+    if (specialOffers) {
+        specialOffers.addEventListener('click', (e) => {
+            if (e.target.closest('.btn-secondary')) {
+                const button = e.target.closest('.btn-secondary');
+                if (button.onclick && button.onclick.toString().includes('addToCart')) {
+                    // تم التعامل معه من خلال onclick
+                    return;
+                }
+                
+                // يمكن إضافة منطق إضافي هنا
+                console.log('🔥 Special offer button clicked');
+            }
+        });
+    }
+    
+    console.log('✅ Product event listeners added');
+};
+
+// دالة للمساعدة في اختبار السلة
+NexusStore.prototype.debugCart = function() {
+    console.log('=== 🛒 Debug Cart ===');
+    console.log('cartManager exists:', !!window.cartManager);
+    console.log('Current cart:', window.cartManager?.cart || 'No cart manager');
+    console.log('Cart items in DOM:', document.querySelectorAll('.cart-item').length);
+    console.log('Cart container:', document.getElementById('cart-items-container'));
+};
+
+// جعل دالة debugCart متاحة عالمياً
+window.debugCart = () => window.app?.debugCart();
 console.log('✅ app.js loaded - Enhanced with product search functions');
