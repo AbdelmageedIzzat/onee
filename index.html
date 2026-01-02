@@ -69,6 +69,12 @@
             border-radius: 2px;
             transition: width 0.3s ease;
         }
+        
+        /* أنيميشن التحميل */
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
     </style>
 </head>
 <body>
@@ -186,7 +192,7 @@
                         <h1 class="hero-title">تجربة تسوق استثنائية</h1>
                         <p class="hero-subtitle">اكتشف آلاف المنتجات بأسعار تنافسية مع توصيل سريع وآمن</p>
                         <div class="hero-buttons">
-                            <button class="btn btn-secondary btn-lg">
+                            <button class="btn btn-secondary btn-lg" onclick="window.app.switchCategory('all')">
                                 <i class="fas fa-shopping-cart"></i>
                                 ابدأ التسوق الآن
                             </button>
@@ -298,12 +304,12 @@
                     <div class="footer-section">
                         <h4>الفئات</h4>
                         <div class="footer-links">
-                            <a href="#"><i class="fas fa-chevron-left"></i> إلكترونيات</a>
-                            <a href="#"><i class="fas fa-chevron-left"></i> أزياء</a>
-                            <a href="#"><i class="fas fa-chevron-left"></i> جمال</a>
-                            <a href="#"><i class="fas fa-chevron-left"></i> منزلية</a>
-                            <a href="#"><i class="fas fa-chevron-left"></i> رياضة</a>
-                            <a href="#"><i class="fas fa-chevron-left"></i> كتب</a>
+                            <a href="#" onclick="window.app.switchCategory('electronics')"><i class="fas fa-chevron-left"></i> إلكترونيات</a>
+                            <a href="#" onclick="window.app.switchCategory('fashion')"><i class="fas fa-chevron-left"></i> أزياء</a>
+                            <a href="#" onclick="window.app.switchCategory('beauty')"><i class="fas fa-chevron-left"></i> جمال</a>
+                            <a href="#" onclick="window.app.switchCategory('home')"><i class="fas fa-chevron-left"></i> منزلية</a>
+                            <a href="#" onclick="window.app.switchCategory('sports')"><i class="fas fa-chevron-left"></i> رياضة</a>
+                            <a href="#" onclick="window.app.switchCategory('books')"><i class="fas fa-chevron-left"></i> كتب</a>
                         </div>
                     </div>
 
@@ -400,6 +406,100 @@
         <button class="back-to-top" id="back-to-top">
             <i class="fas fa-chevron-up"></i>
         </button>
+
+        <!-- Checkout Modal -->
+        <div id="checkout-modal" class="modal">
+            <div class="modal-overlay" onclick="window.checkoutManager.closeModal()"></div>
+            <div class="modal-container">
+                <div class="modal-header">
+                    <h3>إتمام الشراء</h3>
+                    <button class="modal-close" onclick="window.checkoutManager.closeModal()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                
+                <form id="checkout-form" class="modal-body">
+                    <!-- Customer Info -->
+                    <div class="form-section">
+                        <h4>معلومات العميل</h4>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="customer-name">الاسم الكامل *</label>
+                                <input type="text" id="customer-name" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="customer-phone">رقم الهاتف *</label>
+                                <input type="tel" id="customer-phone" class="form-control" required>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Delivery Address -->
+                    <div class="form-section">
+                        <h4>عنوان التوصيل</h4>
+                        <div class="form-group">
+                            <label for="delivery-address">العنوان التفصيلي *</label>
+                            <textarea id="delivery-address" class="form-control" rows="3" required></textarea>
+                            <div class="char-counter" id="address-counter">0/500</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Order Summary -->
+                    <div class="form-section">
+                        <h4>ملخص الطلب</h4>
+                        <div class="order-summary">
+                            <div id="checkout-items"></div>
+                            <div class="summary-totals">
+                                <div class="total-row">
+                                    <span>المجموع:</span>
+                                    <span id="checkout-subtotal">0.00 ريال</span>
+                                </div>
+                                <div class="total-row discount-row" style="display: none;">
+                                    <span>الخصم:</span>
+                                    <span id="checkout-discount">0.00 ريال</span>
+                                </div>
+                                <div class="total-row total">
+                                    <span>المجموع النهائي:</span>
+                                    <span id="checkout-total">0.00 ريال</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Payment Method -->
+                    <div class="form-section">
+                        <h4>طريقة الدفع</h4>
+                        <div id="payment-methods"></div>
+                    </div>
+                    
+                    <!-- Order Notes -->
+                    <div class="form-section">
+                        <h4>ملاحظات إضافية</h4>
+                        <div class="form-group">
+                            <label for="order-notes">ملاحظات حول الطلب (اختياري)</label>
+                            <textarea id="order-notes" class="form-control" rows="2"></textarea>
+                            <div class="char-counter" id="notes-counter">0/500</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Terms -->
+                    <div class="form-section">
+                        <div class="form-check">
+                            <input type="checkbox" id="agree-terms" required>
+                            <label for="agree-terms">أوافق على شروط الخدمة وسياسة الخصوصية</label>
+                        </div>
+                    </div>
+                    
+                    <!-- Submit Button -->
+                    <div class="form-section">
+                        <button type="submit" class="btn btn-primary btn-full btn-lg" id="submit-order">
+                            <i class="fas fa-check"></i>
+                            تأكيد الطلب
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
 
     <!-- Firebase SDK -->
@@ -407,15 +507,16 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 
-<!-- الخطوات 5-8 تأكد من الترتيب الصحيح -->
-<script src="js/firebase-config.js"></script>
-<script src="js/firebase-init.js"></script>
-<script src="js/products.js"></script>
-<script src="js/app.js"></script>
-<script src="js/cart.js"></script>
-<script src="js/ui.js"></script>
-<script src="js/checkout.js"></script>
-<script src="js/search.js"></script>
+    <!-- JS Files (Order is important) -->
+    <script src="js/firebase-config.js"></script>
+    <script src="js/firebase-init.js"></script>
+    <script src="js/utilities.js"></script>
+    <script src="js/products-manager.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/cart.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/checkout.js"></script>
+    <script src="js/search.js"></script>
     
     <script>
         // Loader
