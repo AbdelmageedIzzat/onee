@@ -1,4 +1,4 @@
-// js/cart.js - نظام سلة المشتريات المتقدم
+// js/cart.js - نظام سلة المشتريات المتقدم مع الإصلاحات
 
 console.log('🛒 cart.js - Loading enhanced cart system...');
 
@@ -25,7 +25,8 @@ class CartManager {
     
     loadCart() {
         try {
-            return JSON.parse(localStorage.getItem('nexus_cart')) || [];
+            const cart = localStorage.getItem('nexus_cart');
+            return cart ? JSON.parse(cart) : [];
         } catch (error) {
             console.error('Error loading cart:', error);
             return [];
@@ -41,43 +42,43 @@ class CartManager {
     }
     
     addToCart(productId, quantity = 1) {
-        console.log('📥 Adding to cart - Product ID:', productId);
+        console.log('📥 [CartManager] Adding to cart - Product ID:', productId);
         
-        // البحث عن المنتج في مصادر مختلفة
+        // البحث عن المنتج
         const product = this.findProductById(productId);
         
         if (!product) {
-            console.error('Product not found:', productId);
+            console.error('❌ [CartManager] Product not found:', productId);
             this.showNotification('خطأ', 'المنتج غير متوفر', 'error');
             return false;
         }
         
-        console.log('Found product:', product);
+        console.log('✅ [CartManager] Found product:', product);
         
         // البحث عن المنتج في السلة
         const existingIndex = this.cart.findIndex(item => item.id === productId);
         
         if (existingIndex !== -1) {
-            // تحديث الكمية إذا كان المنتج موجوداً
+            // تحديث الكمية
             this.cart[existingIndex].quantity += quantity;
             this.cart[existingIndex].total = this.cart[existingIndex].price * this.cart[existingIndex].quantity;
-            console.log('Updated existing item:', this.cart[existingIndex]);
+            console.log('🔄 Updated existing item:', this.cart[existingIndex]);
         } else {
             // إضافة منتج جديد
             const cartItem = {
                 id: product.id,
-                name: product.name,
-                price: product.price,
+                name: product.name || `منتج ${productId}`,
+                price: product.price || 0,
                 oldPrice: product.oldPrice,
-                image: product.image,
-                category: product.category,
+                image: product.image || '📦',
+                category: product.category || 'general',
                 quantity: quantity,
-                total: product.price * quantity,
+                total: (product.price || 0) * quantity,
                 maxStock: product.stock || 99
             };
             
             this.cart.push(cartItem);
-            console.log('Added new item:', cartItem);
+            console.log('➕ Added new item:', cartItem);
         }
         
         // حفظ وتحديث الواجهة
@@ -86,7 +87,7 @@ class CartManager {
         
         // إشعار النجاح
         this.showNotification('تمت الإضافة', 
-            `تم إضافة ${product.name} إلى السلة`, 'success');
+            `تم إضافة ${product.name || 'المنتج'} إلى السلة`, 'success');
         
         // تأثير على أيقونة السلة
         this.pulseCartIcon();
@@ -98,32 +99,42 @@ class CartManager {
     }
     
     findProductById(productId) {
-        // المصدر 1: من app.products
-        if (window.app?.products) {
-            console.log('Searching in app.products...');
-            for (const category in window.app.products) {
-                const product = window.app.products[category].find(p => p.id === productId);
-                if (product) {
-                    console.log('Found in app.products:', product);
-                    return product;
-                }
+        console.log('🔍 [CartManager] Searching for product:', productId);
+        
+        // المصدر 1: من app إذا كان متاحاً
+        if (window.app && typeof window.app.getProductById === 'function') {
+            const product = window.app.getProductById(productId);
+            if (product) {
+                console.log('✅ Found in app:', product);
+                return product;
             }
         }
         
         // المصدر 2: من productsManager
-        if (window.productsManager?.productsByCategory) {
-            console.log('Searching in productsManager...');
-            for (const category in window.productsManager.productsByCategory) {
-                const product = window.productsManager.productsByCategory[category].find(p => p.id === productId);
-                if (product) {
-                    console.log('Found in productsManager:', product);
-                    return product;
+        if (window.productsManager && typeof window.productsManager.getProductById === 'function') {
+            const product = window.productsManager.getProductById(productId);
+            if (product) {
+                console.log('✅ Found in productsManager:', product);
+                return product;
+            }
+        }
+        
+        // المصدر 3: البحث في جميع المنتجات
+        if (window.app && window.app.products) {
+            for (const category in window.app.products) {
+                const categoryProducts = window.app.products[category];
+                if (Array.isArray(categoryProducts)) {
+                    const product = categoryProducts.find(p => p.id === productId);
+                    if (product) {
+                        console.log('✅ Found in app.products:', product);
+                        return product;
+                    }
                 }
             }
         }
         
-        // المصدر 3: بيانات افتراضية للطوارئ
-        console.log('Using fallback product data');
+        // المصدر 4: بيانات افتراضية للطوارئ
+        console.log('⚠️ Using fallback product data');
         const fallbackProducts = {
             'elec1': { id: 'elec1', name: 'سماعات لاسلكية', price: 299, image: '🎧', category: 'electronics' },
             'elec2': { id: 'elec2', name: 'ساعة ذكية', price: 499, image: '⌚', category: 'electronics' },
@@ -135,7 +146,13 @@ class CartManager {
             'offer1': { id: 'offer1', name: 'عرض خاص', price: 249, image: '🔥', category: 'offers' }
         };
         
-        return fallbackProducts[productId] || null;
+        return fallbackProducts[productId] || {
+            id: productId,
+            name: `منتج ${productId}`,
+            price: 100,
+            image: '📦',
+            category: 'general'
+        };
     }
     
     removeFromCart(productId) {
@@ -183,7 +200,6 @@ class CartManager {
         window.dispatchEvent(event);
     }
     
-    // باقي الدوال تبقى كما هي مع تعديلات بسيطة...
     applyDiscount(code) {
         const discount = this.discounts[code.toUpperCase()];
         
@@ -263,10 +279,21 @@ class CartManager {
     }
     
     updateCartUI() {
+        console.log('🔄 Updating cart UI...');
+        
+        // تحديث العناصر
         this.renderCartItems();
+        
+        // تحديث الملخص
         this.updateCartSummary();
+        
+        // تحديث العداد
         this.updateCartCount();
+        
+        // تحديث زر الشراء
         this.updateCheckoutButton();
+        
+        console.log('✅ Cart UI updated');
     }
     
     renderCartItems() {
@@ -475,23 +502,43 @@ class CartManager {
         return this.cart.length === 0;
     }
     
-    createOrderSummary() {
+    // ============ إضافة الدوال المفقودة ============
+    
+    /**
+     * الحصول على تفاصيل السلة الكاملة
+     * @returns {Object} - تفاصيل السلة
+     */
+    getCartDetails() {
+        const subtotal = this.getSubtotal();
+        const discount = this.getDiscountAmount();
+        const shipping = this.calculateShipping();
+        const total = this.getTotal();
+        
         return {
             items: this.cart.map(item => ({
                 id: item.id,
                 name: item.name,
                 price: item.price,
+                oldPrice: item.oldPrice,
+                image: item.image,
+                category: item.category,
                 quantity: item.quantity,
-                total: item.total
+                total: item.total || item.price * item.quantity
             })),
-            subtotal: this.getSubtotal(),
-            discount: this.getDiscountAmount(),
-            shipping: this.calculateShipping(),
-            total: this.getTotal(),
-            discountCode: this.activeDiscount?.code
+            subtotal: subtotal,
+            discount: discount,
+            shipping: shipping,
+            total: total,
+            discountCode: this.activeDiscount?.code,
+            itemCount: this.getItemCount(),
+            isEmpty: this.isEmpty()
         };
+    }
+    
+    createOrderSummary() {
+        return this.getCartDetails();
     }
 }
 
 // تصدير مدير السلة
-console.log('✅ CartManager loaded successfully');
+console.log('✅ CartManager loaded successfully with enhanced features');
