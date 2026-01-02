@@ -1,4 +1,4 @@
-// js/cart.js - نظام سلة المشتريات المتقدم مع الإصلاحات
+// js/cart.js - نظام سلة المشتريات المتقدم مع إصلاح مشكلة العرض
 
 console.log('🛒 cart.js - Loading enhanced cart system...');
 
@@ -26,9 +26,11 @@ class CartManager {
     loadCart() {
         try {
             const cart = localStorage.getItem('nexus_cart');
-            return cart ? JSON.parse(cart) : [];
+            const parsed = cart ? JSON.parse(cart) : [];
+            console.log('📦 Loaded cart from localStorage:', parsed);
+            return parsed;
         } catch (error) {
-            console.error('Error loading cart:', error);
+            console.error('❌ Error loading cart:', error);
             return [];
         }
     }
@@ -36,8 +38,9 @@ class CartManager {
     saveCart() {
         try {
             localStorage.setItem('nexus_cart', JSON.stringify(this.cart));
+            console.log('💾 Saved cart to localStorage');
         } catch (error) {
-            console.error('Error saving cart:', error);
+            console.error('❌ Error saving cart:', error);
         }
     }
     
@@ -156,7 +159,7 @@ class CartManager {
     }
     
     removeFromCart(productId) {
-        console.log('Removing from cart:', productId);
+        console.log('🗑️ Removing from cart:', productId);
         const initialLength = this.cart.length;
         this.cart = this.cart.filter(item => item.id !== productId);
         
@@ -198,6 +201,7 @@ class CartManager {
             detail: { cart: this.cart }
         });
         window.dispatchEvent(event);
+        console.log('📢 Cart updated event dispatched');
     }
     
     applyDiscount(code) {
@@ -280,6 +284,7 @@ class CartManager {
     
     updateCartUI() {
         console.log('🔄 Updating cart UI...');
+        console.log('📦 Cart items:', this.cart);
         
         // تحديث العناصر
         this.renderCartItems();
@@ -299,11 +304,11 @@ class CartManager {
     renderCartItems() {
         const container = document.getElementById('cart-items-container');
         if (!container) {
-            console.error('Cart container not found!');
+            console.error('❌ Cart container not found!');
             return;
         }
         
-        console.log('Rendering cart items:', this.cart);
+        console.log('🎨 Rendering cart items:', this.cart);
         
         if (this.cart.length === 0) {
             container.innerHTML = this.createEmptyCartTemplate();
@@ -333,7 +338,10 @@ class CartManager {
     }
     
     createCartItemTemplate(item) {
+        console.log('🖼️ Creating cart item template for:', item);
+        
         const categoryName = this.getCategoryName(item.category);
+        const totalPrice = item.total || (item.price * item.quantity);
         
         return `
             <div class="cart-item" data-id="${item.id}">
@@ -344,7 +352,7 @@ class CartManager {
                 <div class="cart-item-details">
                     <div class="cart-item-header">
                         <h4 class="cart-item-name">${item.name || `منتج ${item.id}`}</h4>
-                        <button class="btn btn-icon btn-sm btn-danger remove-item" data-id="${item.id}">
+                        <button class="btn btn-icon btn-sm btn-danger remove-item" data-id="${item.id}" title="إزالة">
                             <i class="fas fa-times"></i>
                         </button>
                     </div>
@@ -364,18 +372,18 @@ class CartManager {
                     </div>
                     
                     <div class="cart-item-quantity">
-                        <button class="quantity-btn minus" data-id="${item.id}">
+                        <button class="quantity-btn minus" data-id="${item.id}" title="تقليل">
                             <i class="fas fa-minus"></i>
                         </button>
                         <span class="quantity">${item.quantity || 1}</span>
-                        <button class="quantity-btn plus" data-id="${item.id}">
+                        <button class="quantity-btn plus" data-id="${item.id}" title="زيادة">
                             <i class="fas fa-plus"></i>
                         </button>
                     </div>
                 </div>
                 
                 <div class="cart-item-total">
-                    ${(item.total || 0).toFixed(2)} ر.س
+                    ${totalPrice.toFixed(2)} ر.س
                 </div>
             </div>
         `;
@@ -400,33 +408,39 @@ class CartManager {
     }
     
     addCartEventListeners() {
+        console.log('🎯 Adding cart event listeners');
+        
         // أزرار الإزالة
         document.querySelectorAll('.remove-item').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 e.stopPropagation();
                 const productId = e.currentTarget.dataset.id;
+                console.log('🗑️ Remove button clicked for:', productId);
                 this.removeFromCart(productId);
             });
         });
         
-        // أزرار الكمية
+        // أزرار الكمية (زيادة)
         document.querySelectorAll('.quantity-btn.plus').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 e.stopPropagation();
                 const productId = e.currentTarget.dataset.id;
                 const item = this.cart.find(item => item.id === productId);
                 if (item) {
+                    console.log('➕ Plus button clicked for:', productId);
                     this.updateQuantity(productId, item.quantity + 1);
                 }
             });
         });
         
+        // أزرار الكمية (تقليل)
         document.querySelectorAll('.quantity-btn.minus').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 e.stopPropagation();
                 const productId = e.currentTarget.dataset.id;
                 const item = this.cart.find(item => item.id === productId);
                 if (item) {
+                    console.log('➖ Minus button clicked for:', productId);
                     this.updateQuantity(productId, item.quantity - 1);
                 }
             });
@@ -439,15 +453,27 @@ class CartManager {
         const shipping = this.calculateShipping();
         const total = this.getTotal();
         
+        console.log('💰 Cart summary:', { subtotal, discount, shipping, total });
+        
         // تحديث العناصر
         const subtotalEl = document.getElementById('cart-subtotal');
-        const discountEl = document.getElementById('cart-discount');
         const shippingEl = document.getElementById('cart-shipping');
         const totalEl = document.getElementById('cart-total');
         
-        if (subtotalEl) subtotalEl.textContent = `${subtotal.toFixed(2)} ر.س`;
-        if (shippingEl) shippingEl.textContent = shipping === 0 ? 'مجاني' : `${shipping.toFixed(2)} ر.س`;
-        if (totalEl) totalEl.textContent = `${total.toFixed(2)} ر.س`;
+        if (subtotalEl) {
+            subtotalEl.textContent = `${subtotal.toFixed(2)} ر.س`;
+            console.log('✅ Updated subtotal:', subtotalEl.textContent);
+        }
+        
+        if (shippingEl) {
+            shippingEl.textContent = shipping === 0 ? 'مجاني' : `${shipping.toFixed(2)} ر.س`;
+            console.log('✅ Updated shipping:', shippingEl.textContent);
+        }
+        
+        if (totalEl) {
+            totalEl.textContent = `${total.toFixed(2)} ر.س`;
+            console.log('✅ Updated total:', totalEl.textContent);
+        }
         
         // تحديث عداد السلة في الهيدر
         this.updateCartCount();
@@ -455,10 +481,13 @@ class CartManager {
     
     updateCartCount() {
         const count = this.getItemCount();
+        console.log('🔢 Cart count:', count);
+        
         const countElements = document.querySelectorAll('.cart-count');
         
         countElements.forEach(el => {
             el.textContent = count;
+            console.log('✅ Updated cart count element:', el);
         });
     }
     
@@ -466,13 +495,29 @@ class CartManager {
         const checkoutBtn = document.getElementById('checkout-btn');
         if (checkoutBtn) {
             checkoutBtn.disabled = this.cart.length === 0;
+            console.log('✅ Updated checkout button:', checkoutBtn.disabled ? 'disabled' : 'enabled');
         }
     }
     
     setupEventListeners() {
         // تحديث السلة عند أي حدث
         window.addEventListener('cart-updated', () => {
+            console.log('📢 Cart updated event received');
             this.updateCartUI();
+        });
+        
+        // تحديث السلة عند فتح السلة الجانبية
+        document.addEventListener('cart-sidebar-opened', () => {
+            console.log('📢 Cart sidebar opened event received');
+            this.updateCartUI();
+        });
+        
+        // تحديث السلة عند تحميل الصفحة
+        window.addEventListener('load', () => {
+            console.log('📢 Page loaded, updating cart');
+            setTimeout(() => {
+                this.updateCartUI();
+            }, 500);
         });
     }
     
@@ -483,6 +528,7 @@ class CartManager {
             setTimeout(() => {
                 cartIcon.classList.remove('pulse');
             }, 1000);
+            console.log('💓 Pulsed cart icon');
         }
     }
     
@@ -490,7 +536,7 @@ class CartManager {
         if (window.uiManager) {
             window.uiManager.showNotification(title, message, type);
         } else {
-            console.log(`${title}: ${message}`);
+            console.log(`📢 ${title}: ${message}`);
         }
     }
     
@@ -501,8 +547,6 @@ class CartManager {
     isEmpty() {
         return this.cart.length === 0;
     }
-    
-    // ============ إضافة الدوال المفقودة ============
     
     /**
      * الحصول على تفاصيل السلة الكاملة
@@ -541,4 +585,5 @@ class CartManager {
 }
 
 // تصدير مدير السلة
+window.cartManager = new CartManager();
 console.log('✅ CartManager loaded successfully with enhanced features');
