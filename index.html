@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nexus Store | متجر إلكتروني عصري</title>
+    <meta name="description" content="متجر Nexus - تسوق إلكتروني آمن وسريع مع أفضل المنتجات والعروض">
+    <meta name="keywords" content="متجر، تسوق، إلكتروني، منتجات، عروض، خصومات">
+    
+    <!-- Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- CSS Files -->
+    <link rel="stylesheet" href="css/variables.css">
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/pages.css">
+    <link rel="stylesheet" href="css/responsive.css">
+    
+    <!-- Favicon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛒</text></svg>">
+    
+    <style>
+        /* Loader */
+        #app-loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease;
+        }
+        
+        .loader-logo {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            animation: float 2s ease-in-out infinite;
+        }
+        
+        .loader-text {
+            color: white;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+        
+        .loader-progress {
+            width: 200px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 2px;
+            margin-top: 1rem;
+            overflow: hidden;
+        }
+        
+        .loader-progress-bar {
+            height: 100%;
+            background: white;
+            width: 0%;
+            border-radius: 2px;
+            transition: width 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <!-- Loader -->
+    <div id="app-loader">
+        <div class="loader-logo">🛒</div>
+        <div class="loader-text">Nexus Store</div>
+        <div class="loader-progress">
+            <div class="loader-progress-bar" id="loader-progress"></div>
+        </div>
+    </div>
+
+    <!-- Main App -->
+    <div class="app-wrapper" id="app">
+        <!-- Header -->
+        <header class="main-header">
+            <div class="container header-container">
+                <!-- Brand -->
+                <div class="brand">
+                    <div class="brand-logo">
+                        <i class="fas fa-shopping-bag"></i>
+                    </div>
+                    <div class="brand-text">
+                        <div class="brand-name">Nexus Store</div>
+                        <div class="brand-tagline">متجرك الإلكتروني العصري</div>
+                    </div>
+                </div>
+
+                <!-- Search -->
+                <div class="search-container">
+                    <div class="search-wrapper">
+                        <i class="fas fa-search search-icon"></i>
+                        <input type="text" class="search-input" id="global-search" placeholder="ابحث عن منتج أو ماركة...">
+                        <div class="search-results" id="search-results"></div>
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="header-actions">
+                    <!-- Wishlist -->
+                    <button class="btn btn-icon" id="wishlist-btn" title="المفضلة">
+                        <i class="far fa-heart"></i>
+                    </button>
+                    
+                    <!-- Cart -->
+                    <button class="cart-button" id="cart-btn">
+                        <i class="fas fa-shopping-bag"></i>
+                        <span class="cart-count" id="cart-count">0</span>
+                    </button>
+                    
+                    <!-- User -->
+                    <button class="btn btn-icon" id="user-btn" title="حسابي">
+                        <i class="far fa-user"></i>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Categories Navigation -->
+        <nav class="categories-nav">
+            <div class="container categories-container scrollbar-thin">
+                <button class="category-btn active" data-category="all">
+                    <i class="fas fa-fire"></i>
+                    <span>الأكثر مبيعاً</span>
+                </button>
+                
+                <button class="category-btn" data-category="electronics">
+                    <i class="fas fa-laptop"></i>
+                    <span>إلكترونيات</span>
+                </button>
+                
+                <button class="category-btn" data-category="fashion">
+                    <i class="fas fa-tshirt"></i>
+                    <span>أزياء</span>
+                </button>
+                
+                <button class="category-btn" data-category="home">
+                    <i class="fas fa-home"></i>
+                    <span>منزلية</span>
+                </button>
+                
+                <button class="category-btn" data-category="beauty">
+                    <i class="fas fa-spa"></i>
+                    <span>جمال</span>
+                </button>
+                
+                <button class="category-btn" data-category="sports">
+                    <i class="fas fa-futbol"></i>
+                    <span>رياضة</span>
+                </button>
+                
+                <button class="category-btn" data-category="books">
+                    <i class="fas fa-book"></i>
+                    <span>كتب</span>
+                </button>
+                
+                <button class="category-btn" data-category="toys">
+                    <i class="fas fa-gamepad"></i>
+                    <span>ألعاب</span>
+                </button>
+                
+                <button class="category-btn" data-category="offers">
+                    <i class="fas fa-tags"></i>
+                    <span>عروض خاصة</span>
+                </button>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Hero Section -->
+            <section class="hero-section">
+                <div class="container">
+                    <div class="hero-content">
+                        <h1 class="hero-title">تجربة تسوق استثنائية</h1>
+                        <p class="hero-subtitle">اكتشف آلاف المنتجات بأسعار تنافسية مع توصيل سريع وآمن</p>
+                        <div class="hero-buttons">
+                            <button class="btn btn-secondary btn-lg">
+                                <i class="fas fa-shopping-cart"></i>
+                                ابدأ التسوق الآن
+                            </button>
+                            <button class="btn btn-outline btn-lg" style="color: white; border-color: white;">
+                                <i class="fas fa-play-circle"></i>
+                                شاهد الفيديو
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Features Section -->
+            <section class="section features-section">
+                <div class="container">
+                    <h2 class="section-title">لماذا تختار Nexus Store؟</h2>
+                    <div class="features-grid">
+                        <div class="feature-card">
+                            <div class="feature-icon">
+                                <i class="fas fa-shipping-fast"></i>
+                            </div>
+                            <h3 class="feature-title">توصيل سريع</h3>
+                            <p class="feature-description">توصيل خلال 24-48 ساعة لجميع المدن</p>
+                        </div>
+                        
+                        <div class="feature-card">
+                            <div class="feature-icon">
+                                <i class="fas fa-shield-alt"></i>
+                            </div>
+                            <h3 class="feature-title">دفع آمن</h3>
+                            <p class="feature-description">أنظمة دفع متعددة ومحمية بالكامل</p>
+                        </div>
+                        
+                        <div class="feature-card">
+                            <div class="feature-icon">
+                                <i class="fas fa-headset"></i>
+                            </div>
+                            <h3 class="feature-title">دعم فني 24/7</h3>
+                            <p class="feature-description">فريق دعم متاح على مدار الساعة</p>
+                        </div>
+                        
+                        <div class="feature-card">
+                            <div class="feature-icon">
+                                <i class="fas fa-undo-alt"></i>
+                            </div>
+                            <h3 class="feature-title">إرجاع مجاني</h3>
+                            <p class="feature-description">إرجاع المنتجات خلال 14 يوم</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Products Sections (Will be loaded dynamically) -->
+            <div id="category-sections">
+                <!-- سيتم تحميل المنتجات هنا ديناميكياً -->
+            </div>
+
+            <!-- Special Offers -->
+            <section class="section offers-section">
+                <div class="container">
+                    <h2 class="section-title">عروض اليوم</h2>
+                    <div class="offers-slider" id="special-offers">
+                        <!-- سيتم تحميل العروض هنا -->
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="main-footer">
+            <div class="container">
+                <div class="footer-content">
+                    <!-- About -->
+                    <div class="footer-section">
+                        <div class="brand" style="margin-bottom: var(--space-lg);">
+                            <div class="brand-logo">
+                                <i class="fas fa-shopping-bag"></i>
+                            </div>
+                            <div class="brand-text">
+                                <div class="brand-name">Nexus Store</div>
+                            </div>
+                        </div>
+                        <p style="color: rgba(255, 255, 255, 0.8); margin-bottom: var(--space-lg);">
+                            متجر إلكتروني متكامل يقدم أفضل المنتجات بأفضل الأسعار مع خدمة عملاء متميزة وتوصيل سريع.
+                        </p>
+                        <div class="social-links">
+                            <a href="#" class="social-link"><i class="fab fa-facebook-f"></i></a>
+                            <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+                            <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
+                            <a href="#" class="social-link"><i class="fab fa-whatsapp"></i></a>
+                            <a href="#" class="social-link"><i class="fab fa-youtube"></i></a>
+                        </div>
+                    </div>
+
+                    <!-- Quick Links -->
+                    <div class="footer-section">
+                        <h4>روابط سريعة</h4>
+                        <div class="footer-links">
+                            <a href="#"><i class="fas fa-chevron-left"></i> الصفحة الرئيسية</a>
+                            <a href="#"><i class="fas fa-chevron-left"></i> جميع المنتجات</a>
+                            <a href="#"><i class="fas fa-chevron-left"></i> العروض الخاصة</a>
+                            <a href="#"><i class="fas fa-chevron-left"></i> المنتجات الجديدة</a>
+                            <a href="#"><i class="fas fa-chevron-left"></i> الأكثر مبيعاً</a>
+                            <a href="#"><i class="fas fa-chevron-left"></i> المدونة</a>
+                        </div>
+                    </div>
+
+                    <!-- Categories -->
+                    <div class="footer-section">
+                        <h4>الفئات</h4>
+                        <div class="footer-links">
+                            <a href="#"><i class="fas fa-chevron-left"></i> إلكترونيات</a>
+                            <a href="#"><i class="fas fa-chevron-left"></i> أزياء</a>
+                            <a href="#"><i class="fas fa-chevron-left"></i> جمال</a>
+                            <a href="#"><i class="fas fa-chevron-left"></i> منزلية</a>
+                            <a href="#"><i class="fas fa-chevron-left"></i> رياضة</a>
+                            <a href="#"><i class="fas fa-chevron-left"></i> كتب</a>
+                        </div>
+                    </div>
+
+                    <!-- Contact -->
+                    <div class="footer-section">
+                        <h4>معلومات الاتصال</h4>
+                        <div class="footer-info">
+                            <div class="footer-info-item">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <span>المملكة العربية السعودية - الرياض</span>
+                            </div>
+                            <div class="footer-info-item">
+                                <i class="fas fa-phone"></i>
+                                <span>+966 55 123 4567</span>
+                            </div>
+                            <div class="footer-info-item">
+                                <i class="fas fa-envelope"></i>
+                                <span>info@nexus-store.com</span>
+                            </div>
+                            <div class="footer-info-item">
+                                <i class="fas fa-clock"></i>
+                                <span>24/7</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="footer-bottom">
+                    <p>© 2024 Nexus Store. جميع الحقوق محفوظة | تم التطوير بواسطة <span style="color: var(--accent);">فريق Nexus</span></p>
+                </div>
+            </div>
+        </footer>
+
+        <!-- Cart Sidebar -->
+        <div class="cart-overlay" id="cart-overlay"></div>
+        <div class="cart-sidebar" id="cart-sidebar">
+            <div class="cart-header">
+                <h3 style="display: flex; align-items: center; gap: var(--space-sm);">
+                    <i class="fas fa-shopping-bag"></i>
+                    <span>سلة المشتريات</span>
+                    <span class="cart-count" id="sidebar-cart-count">0</span>
+                </h3>
+                <button class="btn btn-icon btn-danger" id="close-cart">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="cart-body scrollbar-thin" id="cart-items-container">
+                <!-- سيتم تحميل عناصر السلة هنا -->
+            </div>
+            
+            <div class="cart-footer">
+                <div class="cart-summary">
+                    <div class="summary-row">
+                        <span>المجموع الجزئي</span>
+                        <span id="cart-subtotal">0.00 ر.س</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>التوصيل</span>
+                        <span id="cart-shipping">مجاني</span>
+                    </div>
+                    <div class="summary-row total">
+                        <span>المجموع الكلي</span>
+                        <span id="cart-total">0.00 ر.س</span>
+                    </div>
+                </div>
+                
+                <div class="cart-actions">
+                    <button class="btn btn-primary btn-full" id="checkout-btn">
+                        <i class="fas fa-shopping-bag"></i>
+                        إتمام الشراء
+                    </button>
+                    <button class="btn btn-outline btn-full" id="continue-shopping">
+                        <i class="fas fa-arrow-left"></i>
+                        متابعة التسوق
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Notification -->
+        <div class="notification" id="notification">
+            <i class="fas fa-check-circle notification-icon success" id="notification-icon"></i>
+            <div class="notification-content">
+                <div class="notification-title" id="notification-title">تمت العملية</div>
+                <div class="notification-message" id="notification-message">تمت العملية بنجاح</div>
+            </div>
+            <button class="notification-close" id="notification-close">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <!-- Back to Top -->
+        <button class="back-to-top" id="back-to-top">
+            <i class="fas fa-chevron-up"></i>
+        </button>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+    <!-- App Scripts -->
+    <script src="js/firebase-config.js"></script>
+    <script src="js/firebase-init.js"></script>
+    <script src="js/products.js"></script>
+    <script src="js/cart.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/checkout.js"></script>
+    <script src="js/search.js"></script>
+    <script src="js/app.js"></script>
+    
+    <script>
+        // Loader
+        document.addEventListener('DOMContentLoaded', function() {
+            const loader = document.getElementById('app-loader');
+            const progressBar = document.getElementById('loader-progress');
+            
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += 10;
+                progressBar.style.width = progress + '%';
+                
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    setTimeout(() => {
+                        loader.style.opacity = '0';
+                        setTimeout(() => {
+                            loader.style.display = 'none';
+                        }, 500);
+                    }, 300);
+                }
+            }, 100);
+        });
+    </script>
+</body>
+</html>
