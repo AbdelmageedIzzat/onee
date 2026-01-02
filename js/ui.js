@@ -14,8 +14,7 @@ class UIManager {
     
     init() {
         console.log('🎯 UIManager initialization...');
-
-     
+        
         // إنشاء العناصر الديناميكية
         this.createNotification();
         this.createModals();
