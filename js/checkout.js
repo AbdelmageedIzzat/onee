@@ -544,4 +544,52 @@ class CheckoutManager {
     
     getPaymentMethodName(methodId) {
         const methods = {
-            'cash': 'الدفع
+            'cash': 'الدفع عند الاستلام',
+            'bank': 'تحويل بنكي',
+            'mada': 'بطاقة مدى',
+            'fawry': 'فوري'
+        };
+        return methods[methodId] || 'غير محدد';
+    }
+    
+    updateCharCounter(field, counterId) {
+        const counter = document.getElementById(counterId);
+        if (counter) {
+            const length = field.value.length;
+            const span = counter.querySelector('span');
+            if (span) span.textContent = length;
+            
+            // تغيير اللون عند الاقتراب من الحد
+            if (length > 450) {
+                counter.style.color = '#EF4444';
+            } else if (length > 400) {
+                counter.style.color = '#F59E0B';
+            } else {
+                counter.style.color = '#718096';
+            }
+        }
+    }
+    
+    escapeText(text) {
+        return text.replace(/'/g, "\\'").replace(/\n/g, '\\n');
+    }
+    
+    showNotification(title, message, type = 'info') {
+        if (window.uiManager?.showNotification) {
+            window.uiManager.showNotification(title, message, type);
+        } else {
+            alert(`${title}: ${message}`);
+        }
+    }
+}
+
+// تهيئة نظام الدفع
+window.checkoutManager = new CheckoutManager();
+
+// دالة مساعدة للتحقق من النظام
+window.debugCheckout = function() {
+    console.log('=== تصحيح نظام الدفع ===');
+    console.log('نافذة الدفع:', document.getElementById('checkout-modal'));
+    console.log('نموذج الدفع:', document.getElementById('checkout-form'));
+    console.log('مدير الدفع:', window.checkoutManager);
+};
