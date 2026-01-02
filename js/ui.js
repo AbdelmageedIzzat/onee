@@ -1,7 +1,4 @@
-[file name]: ui.js
-[file content begin]
-// js/ui.js - نظام واجهة المستخدم المتقدم
-
+// js/ui.js - نظام واجهة المستخدم المتقدم مع الإصلاحات
 console.log('🎨 ui.js - Loading enhanced UI system...');
 
 class UIManager {
@@ -112,106 +109,6 @@ class UIManager {
         
         document.body.appendChild(modal);
         this.modals[config.id] = modal;
-        
-        // إضافة الأنماط إذا لزم الأمر
-        if (!document.querySelector('#modal-styles')) {
-            const style = document.createElement('style');
-            style.id = 'modal-styles';
-            style.textContent = `
-                .modal {
-                    position: fixed;
-                    top: 0;
-                    left: 0;
-                    right: 0;
-                    bottom: 0;
-                    display: none;
-                    align-items: center;
-                    justify-content: center;
-                    z-index: 2000;
-                    padding: var(--space-lg);
-                }
-                
-                .modal.active {
-                    display: flex;
-                    animation: fadeIn 0.3s ease;
-                }
-                
-                .modal-overlay {
-                    position: absolute;
-                    top: 0;
-                    left: 0;
-                    right: 0;
-                    bottom: 0;
-                    background: rgba(0, 0, 0, 0.5);
-                    backdrop-filter: blur(5px);
-                }
-                
-                .modal-container {
-                    background: white;
-                    border-radius: var(--radius-lg);
-                    max-width: 600px;
-                    width: 100%;
-                    max-height: 90vh;
-                    overflow-y: auto;
-                    position: relative;
-                    z-index: 1;
-                    animation: slideInUp 0.3s ease;
-                    box-shadow: var(--shadow-xl);
-                }
-                
-                .modal-header {
-                    padding: var(--space-lg);
-                    border-bottom: 1px solid var(--gray);
-                    display: flex;
-                    justify-content: space-between;
-                    align-items: center;
-                }
-                
-                .modal-header h3 {
-                    margin: 0;
-                }
-                
-                .modal-close {
-                    background: none;
-                    border: none;
-                    color: var(--text-light);
-                    font-size: var(--icon-lg);
-                    cursor: pointer;
-                    padding: var(--space-xs);
-                    border-radius: 50%;
-                    transition: var(--transition);
-                }
-                
-                .modal-close:hover {
-                    background: var(--gray);
-                    color: var(--text);
-                }
-                
-                .modal-body {
-                    padding: var(--space-lg);
-                }
-                
-                .modal-footer {
-                    padding: var(--space-lg);
-                    border-top: 1px solid var(--gray);
-                    display: flex;
-                    gap: var(--space-md);
-                    justify-content: flex-end;
-                }
-                
-                @keyframes slideInUp {
-                    from {
-                        transform: translateY(30px);
-                        opacity: 0;
-                    }
-                    to {
-                        transform: translateY(0);
-                        opacity: 1;
-                    }
-                }
-            `;
-            document.head.appendChild(style);
-        }
     }
     
     initComponents() {
@@ -221,7 +118,7 @@ class UIManager {
         // تهيئة أزرار الفئات
         this.initCategoryButtons();
         
-        // ============ إضافات جديدة: تهيئة السلة ============
+        // تهيئة السلة
         this.initCart();
     }
     
@@ -247,7 +144,6 @@ class UIManager {
         });
     }
     
-    // ============ إضافات جديدة: تهيئة نظام السلة ============
     initCart() {
         console.log('🛒 Initializing cart system in UI...');
         
@@ -260,7 +156,9 @@ class UIManager {
                 // تحديث السلة عند الفتح
                 if (window.cartManager) {
                     console.log('Updating cart UI on open');
-                    window.cartManager.updateCartUI();
+                    setTimeout(() => {
+                        window.cartManager.updateCartUI();
+                    }, 300);
                 }
             });
         } else {
@@ -298,12 +196,10 @@ class UIManager {
             });
         }
         
-        // ============ إضافة مهمة: مستمع حدث تحديث السلة ============
-        // تحديث السلة عند استقبال أي حدث تحديث
+        // مستمع حدث تحديث السلة
         window.addEventListener('cart-updated', (event) => {
             console.log('📢 Cart updated event received in UI:', event.detail);
             if (window.cartManager) {
-                // تحديث السلة فوراً
                 window.cartManager.updateCartUI();
             }
         });
@@ -365,11 +261,10 @@ class UIManager {
             }
         });
         
-        // ============ إضافة مهمة: تحديث السلة عند تحميل الصفحة ============
+        // تحديث السلة عند تحميل الصفحة
         window.addEventListener('load', () => {
             console.log('Page loaded, updating cart UI');
             if (window.cartManager) {
-                // تحديث عداد السلة عند تحميل الصفحة
                 setTimeout(() => {
                     window.cartManager.updateCartCount();
                 }, 500);
@@ -521,78 +416,6 @@ class UIManager {
                 </div>
             </div>
         `).join('');
-        
-        // إضافة أنماط النتائج
-        if (!document.querySelector('#search-results-styles')) {
-            const style = document.createElement('style');
-            style.id = 'search-results-styles';
-            style.textContent = `
-                .search-result {
-                    display: flex;
-                    align-items: center;
-                    gap: var(--space-md);
-                    padding: var(--space-md);
-                    cursor: pointer;
-                    transition: var(--transition);
-                    border-bottom: 1px solid var(--gray);
-                }
-                
-                .search-result:last-child {
-                    border-bottom: none;
-                }
-                
-                .search-result:hover {
-                    background: var(--light);
-                }
-                
-                .search-result-image {
-                    width: 40px;
-                    height: 40px;
-                    background: var(--light);
-                    border-radius: var(--radius-sm);
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    font-size: 1.2rem;
-                    flex-shrink: 0;
-                }
-                
-                .search-result-info {
-                    flex: 1;
-                }
-                
-                .search-result-name {
-                    font-weight: 600;
-                    margin-bottom: 2px;
-                    font-size: var(--font-sm);
-                }
-                
-                .search-result-category {
-                    font-size: var(--font-xs);
-                    color: var(--text-light);
-                    margin-bottom: 2px;
-                }
-                
-                .search-result-price {
-                    font-weight: 700;
-                    color: var(--primary);
-                    font-size: var(--font-sm);
-                }
-                
-                .search-empty {
-                    padding: var(--space-xl);
-                    text-align: center;
-                    color: var(--text-light);
-                }
-                
-                .search-empty i {
-                    font-size: var(--icon-2xl);
-                    margin-bottom: var(--space-sm);
-                    opacity: 0.5;
-                }
-            `;
-            document.head.appendChild(style);
-        }
     }
     
     selectSearchResult(productId) {
@@ -671,15 +494,29 @@ class UIManager {
     }
     
     loadQuickViewData(productId) {
-        const product = window.productsManager?.getProductById(productId);
-        if (!product) return;
+        let product = null;
+        
+        // البحث عن المنتج
+        if (window.productsManager) {
+            product = window.productsManager.getProductById(productId);
+        }
+        
+        if (!product && window.app) {
+            product = window.app.getProductById(productId);
+        }
+        
+        if (!product) {
+            this.showNotification('خطأ', 'المنتج غير موجود', 'error');
+            this.closeModal();
+            return;
+        }
         
         const content = document.getElementById('quick-view-content');
         if (content) {
             content.innerHTML = `
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-xl);">
                     <div class="product-image-large">
-                        ${product.image}
+                        ${product.image || '📦'}
                     </div>
                     <div>
                         <h3 style="margin-bottom: var(--space-sm);">${product.name}</h3>
@@ -714,7 +551,8 @@ class UIManager {
     
     loadProductDetailData(productId) {
         // تفاصيل المنتج الكاملة
-        const product = window.productsManager?.getProductById(productId);
+        const product = window.productsManager?.getProductById(productId) || 
+                       window.app?.getProductById(productId);
         if (!product) return;
         
         const content = document.getElementById('product-detail-content');
@@ -767,105 +605,6 @@ class UIManager {
     
     showDiscountModal() {
         this.openModal('discount-modal');
-    }
-    
-    // ============ إضافات جديدة: تحسينات السلة ============
-    
-    /**
-     * فتح السلة مع تحديث فوري للمحتوى
-     */
-    openCartWithRefresh() {
-        this.openCartSidebar();
-        if (window.cartManager) {
-            // إعطاء وقت قصير للرسوم المتحركة ثم التحديث
-            setTimeout(() => {
-                window.cartManager.updateCartUI();
-            }, 300);
-        }
-    }
-    
-    /**
-     * تحديث عداد السلة في الهيدر
-     */
-    updateCartCounter() {
-        if (window.cartManager) {
-            window.cartManager.updateCartCount();
-        }
-    }
-    
-    // ميزات إضافية
-    showLoading(message = 'جاري التحميل...') {
-        const loading = document.createElement('div');
-        loading.id = 'global-loading';
-        loading.innerHTML = `
-            <div class="loading-content">
-                <div class="loading-spinner"></div>
-                <div class="loading-text">${message}</div>
-            </div>
-        `;
-        
-        loading.style.cssText = `
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(5px);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 3000;
-            animation: fadeIn 0.3s ease;
-        `;
-        
-        document.body.appendChild(loading);
-    }
-    
-    hideLoading() {
-        const loading = document.getElementById('global-loading');
-        if (loading) {
-            loading.style.animation = 'fadeOut 0.3s ease';
-            setTimeout(() => loading.remove(), 300);
-        }
-    }
-    
-    showToast(message, type = 'info', duration = 2000) {
-        const toast = document.createElement('div');
-        toast.className = `toast toast-${type}`;
-        toast.textContent = message;
-        
-        toast.style.cssText = `
-            position: fixed;
-            bottom: var(--space-xl);
-            left: 50%;
-            transform: translateX(-50%);
-            background: ${this.getToastColor(type)};
-            color: white;
-            padding: var(--space-md) var(--space-lg);
-            border-radius: var(--radius);
-            box-shadow: var(--shadow-lg);
-            z-index: 1000;
-            animation: slideInUp 0.3s ease;
-        `;
-        
-        document.body.appendChild(toast);
-        
-        setTimeout(() => {
-            toast.style.animation = 'slideOutDown 0.3s ease';
-            setTimeout(() => toast.remove(), 300);
-        }, duration);
-    }
-    
-    getToastColor(type) {
-        const colors = {
-            success: 'var(--success)',
-            error: 'var(--danger)',
-            warning: 'var(--warning)',
-            info: 'var(--info)'
-        };
-        
-        return colors[type] || 'var(--info)';
     }
     
     // تحسين تجربة المستخدم على الموبايل
@@ -939,9 +678,45 @@ class UIManager {
         // يمكن تحميل المزيد من المنتجات أو المحتوى هنا
         console.log('Loading additional content...');
     }
+    
+    // دوال مساعدة
+    showLoading(message = 'جاري التحميل...') {
+        const loading = document.createElement('div');
+        loading.id = 'global-loading';
+        loading.innerHTML = `
+            <div class="loading-content">
+                <div class="loading-spinner"></div>
+                <div class="loading-text">${message}</div>
+            </div>
+        `;
+        
+        loading.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(5px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 3000;
+            animation: fadeIn 0.3s ease;
+        `;
+        
+        document.body.appendChild(loading);
+    }
+    
+    hideLoading() {
+        const loading = document.getElementById('global-loading');
+        if (loading) {
+            loading.style.animation = 'fadeOut 0.3s ease';
+            setTimeout(() => loading.remove(), 300);
+        }
+    }
 }
 
 // تصدير مدير واجهة المستخدم
 window.uiManager = new UIManager();
-console.log('✅ UIManager loaded successfully - Cart event listeners added');
-[file content end]
+console.log('✅ UIManager loaded successfully');
