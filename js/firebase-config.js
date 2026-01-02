@@ -1,10 +1,10 @@
-// js/firebase-config.js - النسخة النهائية
+// js/firebase-config.js
 const firebaseConfig = {
-  apiKey: "AIzaSyBYourActualAPIKeyHere123456",
-  authDomain: "nexus-store.firebaseapp.com",
-  projectId: "nexus-store",
-  storageBucket: "nexus-store.appspot.com",
-  messagingSenderId: "123456789012",
-  appId: "1:123456789012:web:abcdef1234567890abcd",
-  measurementId: "G-ABCDEF1234"
+  apiKey: "AIzaSyAnc2QZF46bzwqUikXcg-xkgbdAjoNN4ZY",
+  authDomain: "ourmarket-7bbd1.firebaseapp.com",
+  projectId: "ourmarket-7bbd1",
+  storageBucket: "ourmarket-7bbd1.firebasestorage.app",
+  messagingSenderId: "877489389634",
+  appId: "1:877489389634:web:9d9fbad820015275feeddb",
+  measurementId: "G-99YJ6X3ZHS"
 };
