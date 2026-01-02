@@ -1,4 +1,4 @@
-// js/app.js - التطبيق الرئيسي المحسّن
+// js/app.js - التطبيق الرئيسي المحسّن مع الإصلاحات
 
 console.log('🚀 Nexus Store - Starting...');
 
@@ -638,10 +638,76 @@ class NexusStore {
             `;
         }
     }
+    
+    // ================ الدوال المضافة لحل مشكلة البحث عن المنتجات ================
+    
+    /**
+     * البحث عن منتج بواسطة ID
+     * @param {string} productId - معرف المنتج
+     * @returns {Object|null} - بيانات المنتج أو null إذا لم يوجد
+     */
+    getProductById(productId) {
+        console.log('🔍 [NexusStore] Searching for product with ID:', productId);
+        
+        // البحث في جميع الفئات
+        for (const category in this.products) {
+            const categoryProducts = this.products[category];
+            if (Array.isArray(categoryProducts)) {
+                const product = categoryProducts.find(p => p.id === productId);
+                if (product) {
+                    console.log('✅ [NexusStore] Found product:', product);
+                    return product;
+                }
+            }
+        }
+        
+        console.log('❌ [NexusStore] Product not found');
+        return null;
+    }
+    
+    /**
+     * الحصول على جميع المنتجات كقائمة مسطحة
+     * @returns {Array} - قائمة بجميع المنتجات
+     */
+    getAllProducts() {
+        const allProducts = [];
+        for (const category in this.products) {
+            if (Array.isArray(this.products[category])) {
+                allProducts.push(...this.products[category]);
+            }
+        }
+        return allProducts;
+    }
+    
+    /**
+     * البحث عن منتجات بواسطة اسم الفئة
+     * @param {string} categoryId - معرف الفئة
+     * @returns {Array} - منتجات الفئة
+     */
+    getProductsByCategory(categoryId) {
+        return this.products[categoryId] || [];
+    }
+    
+    /**
+     * الحصول على اسم الفئة
+     * @param {string} categoryId - معرف الفئة
+     * @returns {string} - اسم الفئة
+     */
+    getCategoryNameById(categoryId) {
+        const category = this.categories.find(c => c.id === categoryId);
+        return category ? category.name : categoryId;
+    }
 }
 
 // Initialize app
 window.app = new NexusStore();
 
-// Make app available globally
-console.log('✅ app.js loaded');
+// جعل الدوال متاحة عالمياً
+if (window.app) {
+    window.getProductById = (id) => window.app.getProductById(id);
+    window.getAllProducts = () => window.app.getAllProducts();
+    window.getProductsByCategory = (category) => window.app.getProductsByCategory(category);
+    window.getCategoryNameById = (categoryId) => window.app.getCategoryNameById(categoryId);
+}
+
+console.log('✅ app.js loaded - Enhanced with product search functions');
