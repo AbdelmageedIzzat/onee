@@ -1,3 +1,5 @@
+[file name]: ui.js
+[file content begin]
 // js/ui.js - نظام واجهة المستخدم المتقدم
 
 console.log('🎨 ui.js - Loading enhanced UI system...');
@@ -24,6 +26,10 @@ class UIManager {
         
         // تهيئة المكونات
         this.initComponents();
+        
+        // إعداد تحسينات الموبايل والأداء
+        this.setupMobileFeatures();
+        this.setupPerformanceOptimizations();
         
         console.log('✅ UIManager ready!');
     }
@@ -215,7 +221,7 @@ class UIManager {
         // تهيئة أزرار الفئات
         this.initCategoryButtons();
         
-        // تهيئة السلة
+        // ============ إضافات جديدة: تهيئة السلة ============
         this.initCart();
     }
     
@@ -241,13 +247,24 @@ class UIManager {
         });
     }
     
+    // ============ إضافات جديدة: تهيئة نظام السلة ============
     initCart() {
+        console.log('🛒 Initializing cart system in UI...');
+        
         // زر فتح السلة
         const cartBtn = document.getElementById('cart-btn');
         if (cartBtn) {
             cartBtn.addEventListener('click', () => {
+                console.log('Cart button clicked');
                 this.openCartSidebar();
+                // تحديث السلة عند الفتح
+                if (window.cartManager) {
+                    console.log('Updating cart UI on open');
+                    window.cartManager.updateCartUI();
+                }
             });
+        } else {
+            console.warn('Cart button not found!');
         }
         
         // زر إغلاق السلة
@@ -275,9 +292,33 @@ class UIManager {
                     if (window.checkoutManager) {
                         window.checkoutManager.openCheckoutModal();
                     }
+                } else {
+                    this.showNotification('السلة فارغة', 'يرجى إضافة منتجات إلى السلة أولاً', 'warning');
                 }
             });
         }
+        
+        // ============ إضافة مهمة: مستمع حدث تحديث السلة ============
+        // تحديث السلة عند استقبال أي حدث تحديث
+        window.addEventListener('cart-updated', (event) => {
+            console.log('📢 Cart updated event received in UI:', event.detail);
+            if (window.cartManager) {
+                // تحديث السلة فوراً
+                window.cartManager.updateCartUI();
+            }
+        });
+        
+        // تحديث السلة عند فتح السلة الجانبية
+        document.addEventListener('cart-sidebar-opened', () => {
+            console.log('Cart sidebar opened, updating cart');
+            if (window.cartManager) {
+                setTimeout(() => {
+                    window.cartManager.updateCartUI();
+                }, 100);
+            }
+        });
+        
+        console.log('✅ Cart system initialized in UI');
     }
     
     setupEventListeners() {
@@ -321,6 +362,24 @@ class UIManager {
         this.notification?.addEventListener('click', (e) => {
             if (e.target === this.notification) {
                 this.hideNotification();
+            }
+        });
+        
+        // ============ إضافة مهمة: تحديث السلة عند تحميل الصفحة ============
+        window.addEventListener('load', () => {
+            console.log('Page loaded, updating cart UI');
+            if (window.cartManager) {
+                // تحديث عداد السلة عند تحميل الصفحة
+                setTimeout(() => {
+                    window.cartManager.updateCartCount();
+                }, 500);
+            }
+        });
+        
+        // تحديث السلة عند تغيير حجم النافذة
+        window.addEventListener('resize', () => {
+            if (window.cartManager && document.getElementById('cart-sidebar')?.classList.contains('active')) {
+                window.cartManager.updateCartUI();
             }
         });
     }
@@ -385,6 +444,12 @@ class UIManager {
             cartSidebar.classList.add('active');
             cartOverlay.classList.add('active');
             document.body.style.overflow = 'hidden';
+            
+            // إرسال حدث فتح السلة
+            const event = new CustomEvent('cart-sidebar-opened');
+            window.dispatchEvent(event);
+            
+            console.log('Cart sidebar opened');
         }
     }
     
@@ -396,6 +461,8 @@ class UIManager {
             cartSidebar.classList.remove('active');
             cartOverlay.classList.remove('active');
             document.body.style.overflow = '';
+            
+            console.log('Cart sidebar closed');
         }
     }
     
@@ -702,6 +769,30 @@ class UIManager {
         this.openModal('discount-modal');
     }
     
+    // ============ إضافات جديدة: تحسينات السلة ============
+    
+    /**
+     * فتح السلة مع تحديث فوري للمحتوى
+     */
+    openCartWithRefresh() {
+        this.openCartSidebar();
+        if (window.cartManager) {
+            // إعطاء وقت قصير للرسوم المتحركة ثم التحديث
+            setTimeout(() => {
+                window.cartManager.updateCartUI();
+            }, 300);
+        }
+    }
+    
+    /**
+     * تحديث عداد السلة في الهيدر
+     */
+    updateCartCounter() {
+        if (window.cartManager) {
+            window.cartManager.updateCartCount();
+        }
+    }
+    
     // ميزات إضافية
     showLoading(message = 'جاري التحميل...') {
         const loading = document.createElement('div');
@@ -852,4 +943,5 @@ class UIManager {
 
 // تصدير مدير واجهة المستخدم
 window.uiManager = new UIManager();
-console.log('✅ UIManager loaded successfully');
+console.log('✅ UIManager loaded successfully - Cart event listeners added');
+[file content end]
