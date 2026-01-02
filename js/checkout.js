@@ -1,5 +1,5 @@
 // ============================
-// 💳 نظام الدفع الذكي
+// 💳 نظام الدفع الذكي مع الإصلاحات
 // ============================
 
 class CheckoutManager {
@@ -12,6 +12,14 @@ class CheckoutManager {
         this.checkoutDiscount = document.getElementById('checkout-discount');
         this.checkoutTotal = document.getElementById('checkout-total');
         this.submitOrderBtn = document.getElementById('submit-order');
+        
+        // الحقول الإضافية
+        this.customerName = document.getElementById('customer-name');
+        this.customerPhone = document.getElementById('customer-phone');
+        this.deliveryAddress = document.getElementById('delivery-address');
+        this.orderNotes = document.getElementById('order-notes');
+        this.agreeTerms = document.getElementById('agree-terms');
+        
         this.init();
     }
     
@@ -80,7 +88,7 @@ class CheckoutManager {
     // إعداد مستمعي الأحداث
     setupEventListeners() {
         // إغلاق نافذة الدفع
-        const closeBtn = document.getElementById('close-checkout');
+        const closeBtn = this.modal?.querySelector('.modal-close');
         if (closeBtn) {
             closeBtn.addEventListener('click', () => this.closeModal());
         }
@@ -103,18 +111,22 @@ class CheckoutManager {
         });
         
         // تحديث عدادات الأحرف
-        const addressField = document.getElementById('delivery-address');
-        const notesField = document.getElementById('order-notes');
-        
-        if (addressField) {
-            addressField.addEventListener('input', () => {
-                this.updateCharCounter(addressField, 'address-counter');
+        if (this.deliveryAddress) {
+            this.deliveryAddress.addEventListener('input', () => {
+                this.updateCharCounter(this.deliveryAddress, 'address-counter');
             });
         }
         
-        if (notesField) {
-            notesField.addEventListener('input', () => {
-                this.updateCharCounter(notesField, 'notes-counter');
+        if (this.orderNotes) {
+            this.orderNotes.addEventListener('input', () => {
+                this.updateCharCounter(this.orderNotes, 'notes-counter');
+            });
+        }
+        
+        // التحقق من صحة الهاتف أثناء الكتابة
+        if (this.customerPhone) {
+            this.customerPhone.addEventListener('input', (e) => {
+                this.validatePhoneInput(e.target);
             });
         }
     }
@@ -235,17 +247,17 @@ class CheckoutManager {
         
         return {
             // معلومات العميل
-            customerName: document.getElementById('customer-name')?.value.trim() || '',
-            customerPhone: document.getElementById('customer-phone')?.value.trim() || '',
+            customerName: this.customerName?.value.trim() || '',
+            customerPhone: this.customerPhone?.value.trim() || '',
             
             // العنوان
-            address: document.getElementById('delivery-address')?.value.trim() || '',
+            address: this.deliveryAddress?.value.trim() || '',
             
             // طريقة الدفع
             paymentMethod: document.querySelector('input[name="payment"]:checked')?.value || 'cash',
             
             // الملاحظات
-            notes: document.getElementById('order-notes')?.value.trim() || '',
+            notes: this.orderNotes?.value.trim() || '',
             
             // المنتجات
             items: cartDetails.items,
@@ -265,47 +277,42 @@ class CheckoutManager {
     
     // التحقق من صحة النموذج
     validateForm() {
-        const nameField = document.getElementById('customer-name');
-        const phoneField = document.getElementById('customer-phone');
-        const addressField = document.getElementById('delivery-address');
-        const termsCheckbox = document.getElementById('agree-terms');
-        
         let isValid = true;
         let errorMessage = '';
         
         // التحقق من الاسم
-        if (!nameField?.value.trim()) {
+        if (!this.customerName?.value.trim()) {
             errorMessage = 'الرجاء إدخال الاسم الكامل';
-            nameField?.focus();
+            this.customerName?.focus();
             isValid = false;
         }
         
         // التحقق من الهاتف
-        else if (!phoneField?.value.trim()) {
+        else if (!this.customerPhone?.value.trim()) {
             errorMessage = 'الرجاء إدخال رقم الهاتف';
-            phoneField?.focus();
+            this.customerPhone?.focus();
             isValid = false;
-        } else if (!/^05\d{8}$/.test(phoneField.value.trim())) {
+        } else if (!/^05\d{8}$/.test(this.customerPhone.value.trim())) {
             errorMessage = 'رقم الهاتف غير صحيح (يجب أن يبدأ بـ 05 ويتكون من 10 أرقام)';
-            phoneField?.focus();
+            this.customerPhone?.focus();
             isValid = false;
         }
         
         // التحقق من العنوان
-        else if (!addressField?.value.trim()) {
+        else if (!this.deliveryAddress?.value.trim()) {
             errorMessage = 'الرجاء إدخال عنوان التوصيل';
-            addressField?.focus();
+            this.deliveryAddress?.focus();
             isValid = false;
-        } else if (addressField.value.trim().length < 10) {
+        } else if (this.deliveryAddress.value.trim().length < 10) {
             errorMessage = 'العنوان قصير جداً (10 أحرف على الأقل)';
-            addressField?.focus();
+            this.deliveryAddress?.focus();
             isValid = false;
         }
         
         // التحقق من شروط الخدمة
-        else if (!termsCheckbox?.checked) {
+        else if (!this.agreeTerms?.checked) {
             errorMessage = 'الرجاء الموافقة على شروط الخدمة';
-            termsCheckbox?.focus();
+            this.agreeTerms?.focus();
             isValid = false;
         }
         
@@ -433,6 +440,9 @@ class CheckoutManager {
             </div>
         `;
         
+        // إضافة الأنماط إذا لزم الأمر
+        this.addConfirmationStyles();
+        
         // إضافة النافذة إلى الصفحة
         document.body.appendChild(confirmationModal);
         
@@ -444,7 +454,7 @@ class CheckoutManager {
     
     // إنشاء رسالة الطلب للواتساب
     createOrderMessage(orderData) {
-        let message = `🛒 *طلب جديد - Global Store* 🛒\n`;
+        let message = `🛒 *طلب جديد - Nexus Store* 🛒\n`;
         message += `══════════════════════\n\n`;
         
         message += `📋 *معلومات الطلب:*\n`;
@@ -483,7 +493,7 @@ class CheckoutManager {
         }
         
         message += `══════════════════════\n`;
-        message += `شكراً لطلبكم من Global Store! 🚀\n`;
+        message += `شكراً لطلبكم من Nexus Store! 🚀\n`;
         message += `سيتم التواصل معكم قريباً لتأكيد الطلب.\n`;
         
         return message;
@@ -493,7 +503,7 @@ class CheckoutManager {
     sendToWhatsApp(message) {
         try {
             const decodedMessage = message.replace(/\\'/g, "'").replace(/\\n/g, '\n');
-            const whatsappNumber = "+249112703344";
+            const whatsappNumber = "+966551234567"; // رقم افتراضي، يمكن تغييره
             const cleanNumber = whatsappNumber.replace(/\D/g, '');
             const encodedMessage = encodeURIComponent(decodedMessage);
             const whatsappURL = `https://wa.me/${cleanNumber}?text=${encodedMessage}`;
@@ -556,8 +566,10 @@ class CheckoutManager {
         const counter = document.getElementById(counterId);
         if (counter) {
             const length = field.value.length;
-            const span = counter.querySelector('span');
-            if (span) span.textContent = length;
+            const maxLength = 500;
+            
+            // تحديث العداد
+            counter.textContent = `${length}/${maxLength}`;
             
             // تغيير اللون عند الاقتراب من الحد
             if (length > 450) {
@@ -567,6 +579,21 @@ class CheckoutManager {
             } else {
                 counter.style.color = '#718096';
             }
+        }
+    }
+    
+    validatePhoneInput(input) {
+        // إزالة أي أحرف غير رقمية
+        input.value = input.value.replace(/\D/g, '');
+        
+        // إضافة 05 في البداية إذا لم تكن موجودة
+        if (input.value.length > 0 && !input.value.startsWith('05')) {
+            input.value = '05' + input.value.replace(/^05/, '');
+        }
+        
+        // الحد من الطول إلى 10 أرقام
+        if (input.value.length > 10) {
+            input.value = input.value.substring(0, 10);
         }
     }
     
@@ -581,6 +608,164 @@ class CheckoutManager {
             alert(`${title}: ${message}`);
         }
     }
+    
+    addConfirmationStyles() {
+        if (document.querySelector('#confirmation-styles')) return;
+        
+        const style = document.createElement('style');
+        style.id = 'confirmation-styles';
+        style.textContent = `
+            .final-confirmation-modal {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0, 0, 0, 0.8);
+                backdrop-filter: blur(10px);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 3000;
+                padding: var(--space-lg);
+                opacity: 0;
+                visibility: hidden;
+                transition: all 0.3s ease;
+            }
+            
+            .final-confirmation-modal.active {
+                opacity: 1;
+                visibility: visible;
+            }
+            
+            .final-confirmation-content {
+                background: white;
+                border-radius: var(--radius-xl);
+                max-width: 500px;
+                width: 100%;
+                overflow: hidden;
+                box-shadow: var(--shadow-xl);
+                transform: translateY(30px);
+                transition: transform 0.3s ease;
+            }
+            
+            .final-confirmation-modal.active .final-confirmation-content {
+                transform: translateY(0);
+            }
+            
+            .confirmation-header {
+                background: linear-gradient(135deg, var(--success), #0DA67A);
+                color: white;
+                padding: var(--space-xl);
+                text-align: center;
+            }
+            
+            .confirmation-header i {
+                font-size: var(--icon-3xl);
+                margin-bottom: var(--space-md);
+                display: block;
+            }
+            
+            .confirmation-body {
+                padding: var(--space-xl);
+            }
+            
+            .order-details {
+                background: var(--light);
+                border-radius: var(--radius-lg);
+                padding: var(--space-lg);
+                margin-bottom: var(--space-xl);
+            }
+            
+            .order-detail {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: var(--space-sm) 0;
+                border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            }
+            
+            .order-detail:last-child {
+                border-bottom: none;
+            }
+            
+            .whatsapp-notice {
+                background: #25D366;
+                color: white;
+                padding: var(--space-md);
+                border-radius: var(--radius);
+                display: flex;
+                align-items: center;
+                gap: var(--space-md);
+                margin-bottom: var(--space-md);
+            }
+            
+            .whatsapp-notice i {
+                font-size: var(--icon-xl);
+            }
+            
+            .warning-note {
+                background: #FFF3CD;
+                color: #856404;
+                padding: var(--space-md);
+                border-radius: var(--radius);
+                display: flex;
+                align-items: center;
+                gap: var(--space-md);
+            }
+            
+            .warning-note i {
+                color: #FFC107;
+                font-size: var(--icon-xl);
+            }
+            
+            .confirmation-footer {
+                padding: var(--space-xl);
+                border-top: 1px solid var(--gray);
+                display: flex;
+                gap: var(--space-md);
+            }
+            
+            .confirmation-footer .btn-success {
+                background: #25D366;
+                color: white;
+                border: none;
+                padding: var(--space-md) var(--space-lg);
+                border-radius: var(--radius);
+                font-weight: 600;
+                cursor: pointer;
+                flex: 1;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: var(--space-sm);
+                transition: var(--transition);
+            }
+            
+            .confirmation-footer .btn-success:hover {
+                background: #128C7E;
+            }
+            
+            .confirmation-footer .btn-secondary {
+                background: transparent;
+                border: 2px solid var(--gray);
+                color: var(--text);
+                padding: var(--space-md) var(--space-lg);
+                border-radius: var(--radius);
+                font-weight: 600;
+                cursor: pointer;
+                flex: 1;
+                transition: var(--transition);
+            }
+            
+            .confirmation-footer .btn-secondary:hover {
+                border-color: var(--primary);
+                color: var(--primary);
+            }
+        `;
+        
+        document.head.appendChild(style);
+    }
 }
 
 // تهيئة نظام الدفع
@@ -592,4 +777,6 @@ window.debugCheckout = function() {
     console.log('نافذة الدفع:', document.getElementById('checkout-modal'));
     console.log('نموذج الدفع:', document.getElementById('checkout-form'));
     console.log('مدير الدفع:', window.checkoutManager);
+    console.log('مدير السلة:', window.cartManager);
+    console.log('تفاصيل السلة:', window.cartManager?.getCartDetails());
 };
