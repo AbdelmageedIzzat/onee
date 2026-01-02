@@ -15,58 +15,7 @@ class UIManager {
     init() {
         console.log('🎯 UIManager initialization...');
 
-        // في ui.js، أضف هذه الدوال:
-
-// فتح سلة المشتريات
-openCartSidebar() {
-    console.log('UIManager: فتح السلة');
-    
-    // التأكد من تحديث السلة قبل فتحها
-    if (window.cartManager) {
-        window.cartManager.updateCartUI();
-    }
-    
-    if (this.cartSidebar) {
-        this.cartSidebar.classList.add('active');
-    }
-    
-    if (this.cartOverlay) {
-        this.cartOverlay.classList.add('active');
-        document.body.classList.add('modal-open');
-    }
-    
-    console.log('UIManager: تم فتح السلة');
-}
-
-// إغلاق سلة المشتريات
-closeCartSidebar() {
-    console.log('UIManager: إغلاق السلة');
-    
-    if (this.cartSidebar) {
-        this.cartSidebar.classList.remove('active');
-    }
-    
-    if (this.cartOverlay) {
-        this.cartOverlay.classList.remove('active');
-        document.body.classList.remove('modal-open');
-    }
-}
-
-// وفي setupEventListeners، تأكد من:
-setupEventListeners() {
-    // Cart button
-    const cartBtn = document.getElementById('cart-btn');
-    if (cartBtn) {
-        cartBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            this.openCartSidebar(); // استدعاء الدالة الجديدة
-        });
-    }
-    
-    // باقي الأحداث...
-}
-        
+     
         // إنشاء العناصر الديناميكية
         this.createNotification();
         this.createModals();
