@@ -645,38 +645,3 @@ window.app = new NexusStore();
 
 // Make app available globally
 console.log('✅ app.js loaded');
-// اختبار السلة
-testCartFunctionality() {
-    console.log('اختبار وظائف السلة...');
-    
-    // إضافة منتج تجريبي
-    setTimeout(() => {
-        if (window.cartManager) {
-            const testProductId = 'elec1'; // تأكد من أن هذا ID موجود في بيانات المنتجات
-            console.log('محاولة إضافة منتج تجريبي:', testProductId);
-            window.cartManager.addToCart(testProductId);
-        }
-    }, 3000);
-}
-
-// وفي init، استدعاء الاختبار (يمكن إزالته لاحقاً):
-async init() {
-    console.log('🎯 NexusStore initialization...');
-    
-    // Initialize components
-    await this.initComponents();
-    
-    // Load data
-    await this.loadInitialData();
-    
-    // Setup event listeners
-    this.setupEventListeners();
-    
-    // Show welcome
-    this.showWelcome();
-    
-    // اختبار السلة
-    this.testCartFunctionality();
-    
-    console.log('✅ NexusStore ready!');
-}
