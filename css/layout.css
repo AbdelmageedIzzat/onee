@@ -40,15 +40,15 @@
 }
 
 .brand-logo {
-    width: 45px;
-    height: 45px;
+    width: 40px;
+    height: 40px;
     background: linear-gradient(135deg, var(--primary), var(--accent));
     border-radius: var(--radius-md);
     display: flex;
     align-items: center;
     justify-content: center;
     color: white;
-    font-size: var(--icon-xl);
+    font-size: var(--icon-lg);
 }
 
 .brand-text {
@@ -57,7 +57,7 @@
 }
 
 .brand-name {
-    font-size: var(--font-xl);
+    font-size: var(--font-lg);
     font-weight: 800;
     background: linear-gradient(90deg, var(--primary), var(--secondary));
     -webkit-background-clip: text;
@@ -66,7 +66,7 @@
 }
 
 .brand-tagline {
-    font-size: var(--font-xs);
+    font-size: 0.7rem;
     color: var(--text-light);
     margin-top: 2px;
 }
@@ -83,7 +83,7 @@
 
 .search-input {
     width: 100%;
-    padding: 12px 20px 12px 50px;
+    padding: 10px 20px 10px 45px;
     border: 2px solid var(--gray);
     border-radius: var(--radius-full);
     background: white;
@@ -99,11 +99,11 @@
 
 .search-icon {
     position: absolute;
-    left: 18px;
+    left: 15px;
     top: 50%;
     transform: translateY(-50%);
     color: var(--text-light);
-    font-size: var(--icon-base);
+    font-size: var(--icon-sm);
 }
 
 .search-results {
@@ -138,8 +138,8 @@
     position: relative;
     background: white;
     border: 2px solid var(--gray);
-    width: 50px;
-    height: 50px;
+    width: 45px;
+    height: 45px;
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -155,7 +155,7 @@
 }
 
 .cart-button i {
-    font-size: var(--icon-lg);
+    font-size: var(--icon-base);
     color: var(--text);
 }
 
@@ -163,12 +163,12 @@
     position: absolute;
     top: -5px;
     right: -5px;
-    background: linear-gradient(135deg, var(--secondary), var(--secondary-light));
+    background: linear-gradient(135deg, var(--secondary), var(--secondary-light);
     color: white;
-    font-size: var(--font-xs);
+    font-size: 0.65rem;
     font-weight: 700;
-    min-width: 22px;
-    height: 22px;
+    min-width: 18px;
+    height: 18px;
     border-radius: var(--radius-full);
     display: flex;
     align-items: center;
@@ -202,14 +202,14 @@
 .category-btn {
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 10px 20px;
+    gap: 6px;
+    padding: 8px 16px;
     background: var(--light);
     border: 2px solid transparent;
     border-radius: var(--radius-full);
     color: var(--text);
     font-weight: 600;
-    font-size: var(--font-sm);
+    font-size: var(--font-xs);
     white-space: nowrap;
     cursor: pointer;
     transition: var(--transition);
@@ -232,75 +232,40 @@
 }
 
 .category-btn i {
-    font-size: var(--icon-sm);
-}
-
-/* قائمة الفئات السريعة */
-.quick-categories {
-    display: none;
-    position: absolute;
-    top: 100%;
-    left: 0;
-    background: white;
-    border-radius: var(--radius-md);
-    box-shadow: var(--shadow-lg);
-    min-width: 200px;
-    z-index: 1000;
-    overflow: hidden;
-}
-
-.quick-categories.active {
-    display: block;
-}
-
-.quick-category-item {
-    padding: 12px 20px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    cursor: pointer;
-    transition: var(--transition);
-}
-
-.quick-category-item:hover {
-    background: var(--light);
-    color: var(--primary);
-}
-
-.quick-category-item i {
-    color: var(--text-light);
+    font-size: var(--icon-xs);
 }
 
 /* الفوتر المحسن */
 .main-footer {
     background: var(--dark);
     color: white;
-    padding: var(--space-3xl) 0 var(--space-xl);
+    padding: var(--space-2xl) 0 var(--space-xl);
     margin-top: auto;
 }
 
 .footer-content {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: var(--space-2xl);
-    margin-bottom: var(--space-2xl);
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--space-xl);
+    margin-bottom: var(--space-xl);
 }
 
 .footer-section h4 {
     color: white;
-    margin-bottom: var(--space-lg);
-    font-size: var(--font-lg);
+    margin-bottom: var(--space-md);
+    font-size: var(--font-base);
 }
 
 .footer-links {
     display: flex;
     flex-direction: column;
-    gap: var(--space-sm);
+    gap: var(--space-xs);
 }
 
 .footer-links a {
     color: rgba(255, 255, 255, 0.8);
     transition: var(--transition);
+    font-size: var(--font-sm);
 }
 
 .footer-links a:hover {
@@ -311,7 +276,7 @@
 .footer-info {
     display: flex;
     flex-direction: column;
-    gap: var(--space-sm);
+    gap: var(--space-xs);
 }
 
 .footer-info-item {
@@ -319,6 +284,7 @@
     align-items: center;
     gap: var(--space-sm);
     color: rgba(255, 255, 255, 0.8);
+    font-size: var(--font-sm);
 }
 
 .footer-info-item i {
@@ -332,8 +298,8 @@
 }
 
 .social-link {
-    width: 40px;
-    height: 40px;
+    width: 36px;
+    height: 36px;
     border-radius: 50%;
     background: rgba(255, 255, 255, 0.1);
     display: flex;
@@ -341,6 +307,7 @@
     justify-content: center;
     color: white;
     transition: var(--transition);
+    font-size: var(--icon-sm);
 }
 
 .social-link:hover {
@@ -350,8 +317,221 @@
 
 .footer-bottom {
     text-align: center;
-    padding-top: var(--space-xl);
+    padding-top: var(--space-lg);
     border-top: 1px solid rgba(255, 255, 255, 0.1);
     color: rgba(255, 255, 255, 0.6);
+    font-size: var(--font-xs);
+}
+
+/* تحسينات للهاتف */
+@media (max-width: 768px) {
+    :root {
+        --header-height: 65px;
+        --navbar-height: 55px;
+    }
+    
+    .header-container {
+        gap: var(--space-sm);
+    }
+    
+    .search-container {
+        display: none;
+    }
+    
+    .mobile-search-btn {
+        display: block;
+        background: transparent;
+        border: none;
+        color: var(--text);
+        font-size: var(--icon-base);
+        padding: var(--space-sm);
+        cursor: pointer;
+    }
+    
+    .brand-logo {
+        width: 35px;
+        height: 35px;
+        font-size: var(--icon-base);
+    }
+    
+    .brand-name {
+        font-size: var(--font-base);
+    }
+    
+    .brand-tagline {
+        font-size: 0.6rem;
+    }
+    
+    .cart-button {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .cart-button i {
+        font-size: var(--icon-sm);
+    }
+    
+    .cart-count {
+        min-width: 16px;
+        height: 16px;
+        font-size: 0.6rem;
+    }
+    
+    .categories-nav {
+        height: 55px;
+    }
+    
+    .categories-container {
+        gap: var(--space-xs);
+        padding: 0 var(--space-md);
+    }
+    
+    .category-btn {
+        padding: 6px 12px;
+        font-size: 0.7rem;
+    }
+    
+    .category-btn i {
+        font-size: 0.8rem;
+    }
+    
+    .footer-content {
+        grid-template-columns: 1fr;
+        gap: var(--space-lg);
+    }
+    
+    .footer-section h4 {
+        font-size: var(--font-base);
+    }
+    
+    .footer-links a {
+        font-size: var(--font-sm);
+    }
+    
+    .footer-info-item {
+        font-size: var(--font-sm);
+    }
+    
+    .social-link {
+        width: 32px;
+        height: 32px;
+        font-size: var(--icon-xs);
+    }
+}
+
+/* تحسينات للأجهزة اللوحية */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .search-container {
+        max-width: 400px;
+    }
+    
+    .brand-logo {
+        width: 45px;
+        height: 45px;
+    }
+    
+    .brand-name {
+        font-size: var(--font-xl);
+    }
+    
+    .cart-button {
+        width: 50px;
+        height: 50px;
+    }
+    
+    .categories-container {
+        gap: var(--space-sm);
+    }
+}
+
+/* تحسينات للبحث على الموبايل */
+.mobile-search-overlay .mobile-search-input input {
+    font-size: var(--font-base);
+    padding: var(--space-md) var(--space-xl) var(--space-md) var(--space-md);
+}
+
+.mobile-search-overlay .mobile-search-input input:focus {
+    outline: none;
+    border-color: var(--primary);
+}
+
+/* تحسينات للأيقونات الصغيرة */
+.btn-icon.btn-sm {
+    width: 32px;
+    height: 32px;
+    font-size: var(--icon-sm);
+}
+
+/* تحسينات للعناوين */
+.hero-title {
+    font-size: var(--font-3xl);
+}
+
+.hero-subtitle {
+    font-size: var(--font-lg);
+}
+
+@media (max-width: 768px) {
+    .hero-title {
+        font-size: var(--font-2xl);
+    }
+    
+    .hero-subtitle {
+        font-size: var(--font-base);
+    }
+    
+    .section-title {
+        font-size: var(--font-xl);
+    }
+}
+
+/* تحسينات للفجوات */
+.section {
+    padding: var(--space-2xl) 0;
+}
+
+@media (max-width: 768px) {
+    .section {
+        padding: var(--space-xl) 0;
+    }
+}
+
+/* تحسينات للبطاقات */
+.feature-card {
+    padding: var(--space-lg);
+}
+
+.feature-icon {
+    width: 70px;
+    height: 70px;
+    font-size: var(--icon-xl);
+    margin-bottom: var(--space-md);
+}
+
+.feature-title {
+    font-size: var(--font-base);
+}
+
+.feature-description {
     font-size: var(--font-sm);
+}
+
+@media (max-width: 768px) {
+    .feature-card {
+        padding: var(--space-md);
+    }
+    
+    .feature-icon {
+        width: 60px;
+        height: 60px;
+        font-size: var(--icon-lg);
+    }
+    
+    .feature-title {
+        font-size: var(--font-sm);
+    }
+    
+    .feature-description {
+        font-size: var(--font-xs);
+    }
 }
