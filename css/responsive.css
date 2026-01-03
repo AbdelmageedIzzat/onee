@@ -1,29 +1,48 @@
 /* الهواتف الصغيرة (أقل من 576px) */
 @media (max-width: 575.98px) {
     :root {
-        --header-height: 70px;
-        --navbar-height: 60px;
+        --header-height: 60px;
+        --navbar-height: 50px;
     }
     
     .container {
-        padding: 0 var(--space-md);
+        padding: 0 var(--space-sm);
     }
     
     .section {
-        padding: var(--space-2xl) 0;
+        padding: var(--space-xl) 0;
     }
     
     .hero-title {
-        font-size: var(--font-3xl);
+        font-size: var(--font-xl);
+        text-align: center;
     }
     
     .hero-subtitle {
-        font-size: var(--font-lg);
+        font-size: var(--font-sm);
+        text-align: center;
+        margin-bottom: var(--space-lg);
+    }
+    
+    .hero-buttons {
+        flex-direction: column;
+        align-items: center;
+        gap: var(--space-sm);
+    }
+    
+    .hero-buttons .btn {
+        width: 100%;
+        max-width: 250px;
     }
     
     .products-grid {
-        grid-template-columns: 1fr;
-        gap: var(--space-lg);
+        grid-template-columns: repeat(2, 1fr);
+        gap: var(--space-sm);
+    }
+    
+    .compact-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: var(--space-sm) !important;
     }
     
     .search-container {
@@ -38,97 +57,255 @@
         max-width: 100%;
     }
     
-    .product-main {
+    .features-grid {
         grid-template-columns: 1fr;
-    }
-    
-    .checkout-steps {
-        flex-direction: column;
-        align-items: flex-start;
         gap: var(--space-md);
     }
     
-    .step-line {
-        width: 2px;
-        height: 40px;
-        margin: var(--space-xs) 0;
+    .feature-card {
+        text-align: center;
+        padding: var(--space-md);
+    }
+    
+    .offers-slider {
+        grid-template-columns: 1fr;
+        gap: var(--space-md);
+    }
+    
+    .offer-card {
+        min-height: 220px;
+    }
+    
+    .offer-title {
+        font-size: var(--font-lg);
+    }
+    
+    .offer-description {
+        font-size: var(--font-xs);
+    }
+    
+    .offer-price-current {
+        font-size: var(--font-xl);
+    }
+    
+    .timer-numbers {
+        font-size: var(--font-lg);
     }
     
     .footer-content {
         grid-template-columns: 1fr;
-        gap: var(--space-xl);
+        gap: var(--space-lg);
+    }
+    
+    .footer-section {
+        text-align: center;
+    }
+    
+    .social-links {
+        justify-content: center;
+    }
+    
+    /* تحسينات للبحث */
+    .search-results {
+        position: fixed;
+        top: var(--header-height);
+        left: 0;
+        right: 0;
+        bottom: 0;
+        max-height: none;
+        border-radius: 0;
+        margin-top: 0;
+        z-index: 2000;
+        background: white;
+    }
+    
+    /* تحسينات للبطاقات المصغرة */
+    .compact-card {
+        min-height: 240px;
+    }
+    
+    .compact-image {
+        height: 90px !important;
+    }
+    
+    .compact-name {
+        font-size: var(--font-sm) !important;
+        height: 2.4em;
+    }
+    
+    .compact-description {
+        font-size: 0.7rem !important;
+        height: 2.6em;
+    }
+    
+    .price-current {
+        font-size: var(--font-base) !important;
+    }
+    
+    .compact-actions .btn {
+        padding: 4px 8px;
+        font-size: 0.7rem;
+    }
+    
+    /* تحسينات للسلة */
+    .cart-item {
+        grid-template-columns: 50px 1fr;
+        padding: var(--space-sm);
+        gap: var(--space-sm);
+    }
+    
+    .cart-item-image {
+        width: 50px;
+        height: 50px;
+        font-size: 1.2rem;
+    }
+    
+    .cart-item-name {
+        font-size: var(--font-xs);
+    }
+    
+    .cart-item-price {
+        font-size: var(--font-sm);
+    }
+    
+    .cart-item-quantity {
+        padding: 3px 6px;
+    }
+    
+    .quantity-btn {
+        width: 26px;
+        height: 26px;
+    }
+    
+    .quantity-value {
+        min-width: 20px;
     }
 }
 
 /* الهواتف المتوسطة (576px - 768px) */
 @media (min-width: 576px) and (max-width: 768px) {
     .products-grid {
-        grid-template-columns: repeat(2, 1fr);
-        gap: var(--space-lg);
+        grid-template-columns: repeat(3, 1fr);
+        gap: var(--space-md);
+    }
+    
+    .compact-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: var(--space-md) !important;
     }
     
     .features-grid {
         grid-template-columns: repeat(2, 1fr);
+        gap: var(--space-md);
     }
     
     .offers-slider {
         grid-template-columns: 1fr;
     }
     
-    .product-main {
-        grid-template-columns: 1fr;
+    .search-container {
+        display: none;
     }
     
-    .checkout-steps {
-        gap: var(--space-md);
+    .mobile-search-btn {
+        display: block;
     }
     
-    .step-line {
+    /* تحسينات للبطاقات المصغرة */
+    .compact-card {
+        min-height: 260px;
+    }
+    
+    .compact-image {
+        height: 110px !important;
+    }
+    
+    .compact-card.expanded {
+        grid-column: 1 / -1;
+        min-height: 320px;
+    }
+    
+    /* تحسينات للسلة */
+    .cart-item {
+        grid-template-columns: 60px 1fr;
+    }
+    
+    .cart-item-image {
         width: 60px;
+        height: 60px;
     }
 }
 
 /* الأجهزة اللوحية (768px - 992px) */
 @media (min-width: 768px) and (max-width: 991.98px) {
     .products-grid {
-        grid-template-columns: repeat(3, 1fr);
+        grid-template-columns: repeat(4, 1fr);
+    }
+    
+    .compact-grid {
+        grid-template-columns: repeat(4, 1fr);
     }
     
     .features-grid {
-        grid-template-columns: repeat(3, 1fr);
+        grid-template-columns: repeat(2, 1fr);
     }
     
     .offers-slider {
         grid-template-columns: repeat(2, 1fr);
     }
     
-    .product-main {
-        grid-template-columns: 1fr;
+    .search-container {
+        max-width: 400px;
+    }
+    
+    /* تحسينات للبطاقات المصغرة */
+    .compact-card {
+        min-height: 280px;
+    }
+    
+    .compact-card.expanded {
+        grid-column: span 2;
     }
 }
 
 /* الأجهزة الصغيرة (992px - 1200px) */
 @media (min-width: 992px) and (max-width: 1199.98px) {
     .products-grid {
-        grid-template-columns: repeat(4, 1fr);
+        grid-template-columns: repeat(5, 1fr);
+    }
+    
+    .compact-grid {
+        grid-template-columns: repeat(5, 1fr);
     }
     
     .features-grid {
         grid-template-columns: repeat(4, 1fr);
+    }
+    
+    .offers-slider {
+        grid-template-columns: repeat(3, 1fr);
     }
 }
 
 /* الأجهزة الكبيرة (1200px فأكثر) */
 @media (min-width: 1200px) {
     .products-grid {
-        grid-template-columns: repeat(5, 1fr);
+        grid-template-columns: repeat(6, 1fr);
+    }
+    
+    .compact-grid {
+        grid-template-columns: repeat(6, 1fr);
     }
 }
 
 /* الشاشات الكبيرة جداً */
 @media (min-width: 1400px) {
     .products-grid {
-        grid-template-columns: repeat(6, 1fr);
+        grid-template-columns: repeat(7, 1fr);
+    }
+    
+    .compact-grid {
+        grid-template-columns: repeat(7, 1fr);
     }
 }
 
@@ -144,11 +321,29 @@
     }
     
     .hero-section {
-        padding: var(--space-xl) 0;
+        padding: var(--space-lg) 0;
     }
     
     .hero-title {
-        font-size: var(--font-2xl);
+        font-size: var(--font-lg);
+    }
+    
+    .hero-subtitle {
+        font-size: var(--font-sm);
+    }
+    
+    /* تحسينات للعروض في الوضع الأفقي */
+    .offers-slider {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .offer-card {
+        min-height: 200px;
+    }
+    
+    /* تحسينات للبحث في الوضع الأفقي */
+    .search-results {
+        max-height: 300px;
     }
 }
 
@@ -166,10 +361,15 @@
         transform: none;
     }
     
+    .offer-card:hover {
+        transform: none;
+    }
+    
     /* تحسين المسافة بين العناصر للمس */
     .btn,
     .category-btn,
-    .product-actions button {
+    .product-actions button,
+    .quantity-btn {
         min-height: 44px;
         min-width: 44px;
     }
@@ -183,6 +383,53 @@
     select,
     textarea {
         font-size: 16px;
+    }
+    
+    /* تحسينات للمس على الموبايل */
+    .compact-card {
+        cursor: pointer;
+    }
+    
+    .compact-card:active {
+        transform: scale(0.98);
+    }
+    
+    /* تحسينات لأزرار الكمية على الموبايل */
+    .quantity-btn {
+        min-width: 44px;
+        min-height: 44px;
+    }
+    
+    .cart-item-quantity {
+        padding: 8px 12px;
+    }
+    
+    /* تحسينات للبحث على الموبايل */
+    .search-result-item {
+        min-height: 60px;
+        padding: var(--space-md);
+    }
+    
+    .search-result-item:active {
+        background-color: var(--light);
+    }
+    
+    /* تحسينات للإشعارات على الموبايل */
+    .notification {
+        bottom: 80px;
+        right: var(--space-sm);
+        left: var(--space-sm);
+    }
+    
+    /* تحسينات للفئات على الموبايل */
+    .category-btn {
+        padding: 10px 16px;
+        margin: 2px;
+    }
+    
+    /* تحسينات للعروض على الموبايل */
+    .offer-btn {
+        padding: var(--space-md) var(--space-lg);
     }
 }
 
@@ -223,6 +470,48 @@
         border-color: var(--gray);
         color: var(--text);
     }
+    
+    /* تحسينات للعروض في الوضع الداكن */
+    .offer-card {
+        background: linear-gradient(135deg, #9c2c4a, #b53a5c);
+    }
+    
+    .offer-timer {
+        background: rgba(255, 255, 255, 0.15);
+    }
+    
+    /* تحسينات للسلة في الوضع الداكن */
+    .cart-sidebar {
+        background: var(--dark-light);
+        color: var(--text);
+    }
+    
+    .cart-item {
+        background: var(--dark);
+        color: var(--text);
+    }
+    
+    .cart-item-name {
+        color: var(--text);
+    }
+    
+    .cart-summary {
+        background: var(--dark);
+    }
+    
+    /* تحسينات للبحث في الوضع الداكن */
+    .search-results {
+        background: var(--dark-light);
+        color: var(--text);
+    }
+    
+    .search-result-item {
+        border-color: var(--gray);
+    }
+    
+    .search-result-item:hover {
+        background: var(--dark);
+    }
 }
 
 /* تحسينات للطباعة */
@@ -232,7 +521,8 @@
     .footer,
     .cart-button,
     .back-to-top,
-    .notification {
+    .notification,
+    .mobile-search-btn {
         display: none !important;
     }
     
@@ -248,5 +538,111 @@
     a {
         color: black !important;
         text-decoration: underline !important;
+    }
+    
+    /* تحسينات لبطاقات المنتجات في الطباعة */
+    .compact-card {
+        break-inside: avoid;
+        border: 1px solid #ddd;
+        box-shadow: none !important;
+    }
+    
+    .compact-image {
+        border: 1px solid #eee;
+    }
+    
+    /* إخفاء الأزرار في الطباعة */
+    .btn,
+    .product-actions {
+        display: none !important;
+    }
+}
+
+/* تحسينات خاصة للشاشات الصغيرة جداً */
+@media (max-width: 350px) {
+    .compact-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .compact-card {
+        min-height: 220px;
+    }
+    
+    .compact-image {
+        height: 80px !important;
+    }
+    
+    .brand-name {
+        font-size: var(--font-sm);
+    }
+    
+    .brand-tagline {
+        display: none;
+    }
+    
+    .hero-buttons .btn {
+        padding: var(--space-sm) var(--space-md);
+        font-size: var(--font-sm);
+    }
+    
+    .feature-card {
+        padding: var(--space-sm);
+    }
+    
+    .feature-icon {
+        width: 50px;
+        height: 50px;
+        font-size: var(--icon-base);
+    }
+}
+
+/* تحسينات للأجهزة ذات الشاشات العريضة */
+@media (min-width: 1600px) {
+    .container {
+        max-width: 1500px;
+    }
+    
+    .compact-grid {
+        grid-template-columns: repeat(8, 1fr);
+    }
+    
+    .compact-card.expanded {
+        grid-column: span 3;
+        min-height: 450px;
+    }
+}
+
+/* تحسينات لشاشات Retina */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    .brand-logo,
+    .feature-icon,
+    .cart-item-image,
+    .compact-image {
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+    
+    .btn,
+    .category-btn {
+        -webkit-font-smoothing: antialiased;
+    }
+}
+
+/* تحسينات لأجهزة iOS */
+@supports (-webkit-touch-callout: none) {
+    .cart-button,
+    .category-btn,
+    .btn {
+        -webkit-tap-highlight-color: transparent;
+    }
+    
+    input,
+    textarea {
+        font-size: 16px !important; /* منع التكبير التلقائي في iOS */
+    }
+    
+    .search-input,
+    .mobile-search-input input {
+        font-size: 16px !important;
     }
 }
