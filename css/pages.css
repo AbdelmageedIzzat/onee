@@ -575,3 +575,294 @@
 .data-table tr:hover {
     background: var(--light);
 }
+/* ============== تحسينات إضافية للعروض ============== */
+
+.offers-section {
+    padding-top: var(--space-3xl);
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    position: relative;
+    overflow: hidden;
+}
+
+.offers-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 100px;
+    background: linear-gradient(to bottom, rgba(255,255,255,1), rgba(255,255,255,0));
+    z-index: 1;
+}
+
+.offers-slider {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: var(--space-lg);
+    position: relative;
+    z-index: 2;
+}
+
+@media (max-width: 768px) {
+    .offers-section {
+        padding-top: var(--space-2xl);
+    }
+    
+    .offers-slider {
+        grid-template-columns: 1fr;
+        gap: var(--space-md);
+    }
+}
+
+/* ============== تحسينات للبطاقات المصغرة ============== */
+
+.product-card {
+    position: relative;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.product-card.compact-card {
+    border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.product-card.compact-card.expanded {
+    border-color: var(--primary);
+    box-shadow: 0 10px 40px rgba(67, 97, 238, 0.15);
+    z-index: 5;
+}
+
+/* ============== تحسينات للهاتف ============== */
+
+@media (max-width: 768px) {
+    .hero-section {
+        padding: var(--space-xl) 0;
+        text-align: center;
+    }
+    
+    .hero-buttons {
+        flex-direction: column;
+        align-items: stretch;
+        gap: var(--space-sm);
+    }
+    
+    .hero-buttons .btn {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .features-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: var(--space-md);
+    }
+    
+    .feature-card {
+        padding: var(--space-md);
+    }
+    
+    .feature-icon {
+        width: 50px;
+        height: 50px;
+        font-size: var(--icon-lg);
+        margin-bottom: var(--space-sm);
+    }
+    
+    .feature-title {
+        font-size: var(--font-sm);
+        margin-bottom: var(--space-xs);
+    }
+    
+    .feature-description {
+        font-size: var(--font-xs);
+    }
+    
+    .products-grid {
+        gap: var(--space-sm);
+    }
+    
+    .section-title {
+        font-size: var(--font-lg);
+        margin-bottom: var(--space-lg);
+    }
+    
+    .category-header h2 {
+        font-size: var(--font-base);
+    }
+}
+
+/* ============== تحسينات للعناصر التفاعلية ============== */
+
+.btn, .category-btn, .product-actions button {
+    -webkit-tap-highlight-color: transparent;
+}
+
+.btn:active, .category-btn:active {
+    transform: scale(0.98);
+}
+
+/* ============== تحسينات للعروض على الهاتف ============== */
+
+@media (max-width: 480px) {
+    .offer-card {
+        min-height: 200px;
+    }
+    
+    .offer-content {
+        padding: var(--space-lg);
+    }
+    
+    .offer-title {
+        font-size: var(--font-base);
+    }
+    
+    .offer-description {
+        font-size: var(--font-xs);
+        margin-bottom: var(--space-md);
+    }
+    
+    .offer-price-current {
+        font-size: var(--font-lg);
+    }
+    
+    .offer-price-old {
+        font-size: var(--font-base);
+    }
+    
+    .timer-numbers {
+        font-size: var(--font-lg);
+    }
+    
+    .timer-unit {
+        font-size: 0.6rem;
+    }
+    
+    .offer-btn {
+        padding: var(--space-sm) var(--space-md);
+        font-size: var(--font-xs);
+    }
+}
+
+/* ============== تحسينات للبحث على الهاتف ============== */
+
+@media (max-width: 768px) {
+    .search-results {
+        top: 60px;
+        max-height: calc(100vh - 60px);
+        border-radius: 0;
+    }
+    
+    .search-result {
+        padding: var(--space-sm);
+        min-height: 60px;
+    }
+    
+    .search-result-image {
+        width: 40px;
+        height: 40px;
+        font-size: 1.2rem;
+    }
+    
+    .search-result-name {
+        font-size: var(--font-sm);
+    }
+    
+    .search-result-category {
+        font-size: var(--font-xs);
+    }
+    
+    .search-result-price {
+        font-size: var(--font-sm);
+    }
+}
+
+/* ============== تحسينات للسلة على الهاتف ============== */
+
+@media (max-width: 768px) {
+    .cart-sidebar {
+        max-width: 100%;
+    }
+    
+    .cart-header {
+        padding: var(--space-sm);
+    }
+    
+    .cart-header h3 {
+        font-size: var(--font-base);
+    }
+    
+    .cart-body {
+        padding: var(--space-xs) !important;
+    }
+    
+    .cart-footer {
+        padding: var(--space-sm);
+    }
+    
+    .cart-summary {
+        padding: var(--space-sm);
+        margin: var(--space-sm) 0;
+    }
+    
+    .summary-row {
+        font-size: var(--font-xs);
+        padding: 4px 0;
+    }
+    
+    .summary-row.total {
+        font-size: var(--font-sm);
+    }
+    
+    .cart-actions {
+        margin-top: var(--space-sm);
+    }
+    
+    .cart-checkout-btn,
+    .cart-continue-btn {
+        padding: var(--space-sm);
+        font-size: var(--font-sm);
+    }
+}
+
+/* ============== تحسينات عامة للهاتف ============== */
+
+@media (max-width: 768px) {
+    .container {
+        padding-left: var(--space-sm);
+        padding-right: var(--space-sm);
+    }
+    
+    h1, h2, h3, h4, h5, h6 {
+        line-height: 1.3;
+    }
+    
+    .btn {
+        min-height: 44px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    input, select, textarea {
+        font-size: 16px !important; /* منع التكبير في iOS */
+    }
+    
+    /* تحسينات للتمرير السلس */
+    .categories-container {
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    /* تحسينات للظلال على الهاتف */
+    .card, .product-card, .offer-card {
+        box-shadow: var(--shadow-sm);
+    }
+    
+    /* تحسينات للهوامش */
+    .section {
+        padding: var(--space-lg) 0;
+    }
+    
+    /* تحسينات للأيقونات */
+    .btn-icon {
+        min-width: 44px;
+        min-height: 44px;
+    }
+}
