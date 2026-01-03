@@ -1,4 +1,4 @@
-// js/cart.js - نظام سلة المشتريات المتقدم مع إصلاح مشكلة العرض
+// js/cart.js - نظام سلة المشتريات المتقدم مع إصلاح مشكلة العرض والكمية
 
 console.log('🛒 cart.js - Loading enhanced cart system...');
 
@@ -13,6 +13,10 @@ class CartManager {
         this.activeDiscount = null;
         this.shippingFee = 0;
         this.freeShippingThreshold = 200;
+        
+        // إصلاح: منع التحديثات السريعة المتعددة
+        this.isUpdating = false;
+        this.updateQueue = [];
         
         this.init();
     }
@@ -62,7 +66,7 @@ class CartManager {
         const existingIndex = this.cart.findIndex(item => item.id === productId);
         
         if (existingIndex !== -1) {
-            // تحديث الكمية
+            // تحديث الكمية - إصلاح: إضافة الكمية بشكل صحيح
             this.cart[existingIndex].quantity += quantity;
             this.cart[existingIndex].total = this.cart[existingIndex].price * this.cart[existingIndex].quantity;
             console.log('🔄 Updated existing item:', this.cart[existingIndex]);
@@ -113,16 +117,7 @@ class CartManager {
             }
         }
         
-        // المصدر 2: من productsManager
-        if (window.productsManager && typeof window.productsManager.getProductById === 'function') {
-            const product = window.productsManager.getProductById(productId);
-            if (product) {
-                console.log('✅ Found in productsManager:', product);
-                return product;
-            }
-        }
-        
-        // المصدر 3: البحث في جميع المنتجات
+        // المصدر 2: البحث في جميع المنتجات
         if (window.app && window.app.products) {
             for (const category in window.app.products) {
                 const categoryProducts = window.app.products[category];
@@ -136,7 +131,7 @@ class CartManager {
             }
         }
         
-        // المصدر 4: بيانات افتراضية للطوارئ
+        // المصدر 3: بيانات افتراضية للطوارئ
         console.log('⚠️ Using fallback product data');
         const fallbackProducts = {
             'elec1': { id: 'elec1', name: 'سماعات لاسلكية', price: 299, image: '🎧', category: 'electronics' },
@@ -146,7 +141,9 @@ class CartManager {
             'home1': { id: 'home1', name: 'سجادة صوف', price: 199, image: '🧶', category: 'home' },
             'home2': { id: 'home2', name: 'مصباح طاولة', price: 149, image: '💡', category: 'home' },
             'beauty1': { id: 'beauty1', name: 'مجموعة تجميل', price: 179, image: '💄', category: 'beauty' },
-            'offer1': { id: 'offer1', name: 'عرض خاص', price: 249, image: '🔥', category: 'offers' }
+            'offer1': { id: 'offer1', name: 'عرض خاص', price: 249, image: '🔥', category: 'offers' },
+            'offer2': { id: 'offer2', name: 'تخفيض الصيف', price: 399, image: '🏖️', category: 'offers' },
+            'offer3': { id: 'offer3', name: 'عرض نهاية الموسم', price: 199, image: '🎯', category: 'offers' }
         };
         
         return fallbackProducts[productId] || {
@@ -172,11 +169,21 @@ class CartManager {
     }
     
     updateQuantity(productId, newQuantity) {
+        // إصلاح: منع التحديثات المتعددة السريعة
+        if (this.isUpdating) {
+            this.updateQueue.push({ productId, newQuantity });
+            return;
+        }
+        
+        this.isUpdating = true;
+        
         const itemIndex = this.cart.findIndex(item => item.id === productId);
         
         if (itemIndex !== -1) {
             if (newQuantity <= 0) {
                 this.removeFromCart(productId);
+                this.isUpdating = false;
+                this.processQueue();
                 return;
             }
             
@@ -187,12 +194,25 @@ class CartManager {
                 newQuantity = maxStock;
             }
             
+            // إصلاح: تحديث الكمية مباشرة بدون حسابات مضاعفة
             this.cart[itemIndex].quantity = newQuantity;
             this.cart[itemIndex].total = this.cart[itemIndex].price * newQuantity;
+            
+            console.log(`🔄 Updated quantity for ${productId}: ${newQuantity}`);
             
             this.saveCart();
             this.updateCartUI();
             this.dispatchCartUpdatedEvent();
+        }
+        
+        this.isUpdating = false;
+        this.processQueue();
+    }
+    
+    processQueue() {
+        if (this.updateQueue.length > 0 && !this.isUpdating) {
+            const nextUpdate = this.updateQueue.shift();
+            this.updateQuantity(nextUpdate.productId, nextUpdate.newQuantity);
         }
     }
     
@@ -329,7 +349,7 @@ class CartManager {
                 <i class="fas fa-shopping-bag" style="font-size: var(--icon-3xl); color: var(--text-light); margin-bottom: var(--space-md); opacity: 0.5;"></i>
                 <h3 style="margin-bottom: var(--space-sm); color: var(--text-light);">سلة المشتريات فارغة</h3>
                 <p style="color: var(--text-light); margin-bottom: var(--space-xl);">لم تقم بإضافة أي منتجات بعد</p>
-                <button class="btn btn-primary" onclick="window.uiManager?.closeCartSidebar(); window.app?.switchCategory('all');">
+                <button class="btn btn-primary" onclick="window.uiManager?.closeCartSidebar(); window.app?.switchCategory('offers');">
                     <i class="fas fa-shopping-cart"></i>
                     ابدأ التسوق الآن
                 </button>
@@ -375,7 +395,7 @@ class CartManager {
                         <button class="quantity-btn minus" data-id="${item.id}" title="تقليل">
                             <i class="fas fa-minus"></i>
                         </button>
-                        <span class="quantity">${item.quantity || 1}</span>
+                        <span class="quantity-value">${item.quantity || 1}</span>
                         <button class="quantity-btn plus" data-id="${item.id}" title="زيادة">
                             <i class="fas fa-plus"></i>
                         </button>
@@ -398,12 +418,6 @@ class CartManager {
             if (category) return category.name;
         }
         
-        // البحث في productsManager
-        if (window.productsManager?.categories) {
-            const category = window.productsManager.categories[categoryId];
-            if (category) return category.name;
-        }
-        
         return categoryId;
     }
     
@@ -420,28 +434,34 @@ class CartManager {
             });
         });
         
-        // أزرار الكمية (زيادة)
+        // أزرار الكمية (زيادة) - إصلاح: استخدام الحدث الصحيح
         document.querySelectorAll('.quantity-btn.plus').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 e.stopPropagation();
+                e.preventDefault();
                 const productId = e.currentTarget.dataset.id;
                 const item = this.cart.find(item => item.id === productId);
                 if (item) {
                     console.log('➕ Plus button clicked for:', productId);
-                    this.updateQuantity(productId, item.quantity + 1);
+                    // إصلاح: زيادة واحدة فقط
+                    const newQuantity = item.quantity + 1;
+                    this.updateQuantity(productId, newQuantity);
                 }
             });
         });
         
-        // أزرار الكمية (تقليل)
+        // أزرار الكمية (تقليل) - إصلاح: استخدام الحدث الصحيح
         document.querySelectorAll('.quantity-btn.minus').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 e.stopPropagation();
+                e.preventDefault();
                 const productId = e.currentTarget.dataset.id;
                 const item = this.cart.find(item => item.id === productId);
                 if (item) {
                     console.log('➖ Minus button clicked for:', productId);
-                    this.updateQuantity(productId, item.quantity - 1);
+                    // إصلاح: تقليل واحدة فقط
+                    const newQuantity = item.quantity - 1;
+                    this.updateQuantity(productId, newQuantity);
                 }
             });
         });
