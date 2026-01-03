@@ -1,373 +1,203 @@
-// js/firebase-init.js
-console.log('🚀 تهيئة Firebase...');
+// js/firebase-init.js - تهيئة Firebase مع تحسينات
 
-class FirebaseManager {
-    constructor() {
-        this.isInitialized = false;
-        this.db = null;
-        this.auth = null;
-        this.init();
+console.log('🔥 Initializing Firebase...');
+
+// التحقق من وجود Firebase
+if (typeof firebase === 'undefined') {
+    console.error('❌ Firebase SDK not loaded!');
+} else {
+    try {
+        // Initialize Firebase
+        const app = firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+        
+        // جعلها متاحة عالمياً
+        window.firebaseApp = app;
+        window.auth = auth;
+        window.db = db;
+        
+        console.log('✅ Firebase initialized successfully');
+        
+        // تحسينات الأداء
+        this.optimizeFirebase();
+        
+    } catch (error) {
+        console.error('❌ Firebase initialization error:', error);
+        // الاستمرار بدون Firebase
+        window.db = null;
     }
+}
+
+// تحسينات Firebase للأداء
+function optimizeFirebase() {
+    if (!window.db) return;
     
-    async init() {
-        try {
-            // التحقق من وجود Firebase SDK
-            if (typeof firebase === 'undefined') {
-                throw new Error('Firebase SDK غير محمل');
-            }
-            
-            // التحقق من وجود الإعدادات
-            if (typeof firebaseConfig === 'undefined') {
-                throw new Error('إعدادات Firebase غير موجودة');
-            }
-            
-            console.log('✅ بدء تهيئة Firebase...');
-            
-            // التحقق من التهيئة المسبقة
-            if (!firebase.apps.length) {
-                this.app = firebase.initializeApp(firebaseConfig);
-                console.log('🔥 Firebase تم تهيئته لأول مرة');
-            } else {
-                this.app = firebase.app();
-                console.log('🔥 Firebase مهيأ مسبقاً');
-            }
-            
-            // تهيئة الخدمات
-            this.auth = firebase.auth();
-            this.db = firebase.firestore();
-            
-            // إعدادات الأداء
-            this.db.settings({
-                cacheSizeBytes: firebase.firestore.CACHE_SIZE_UNLIMITED
+    try {
+        // تحسينات Firestore
+        const settings = {
+            cacheSizeBytes: firebase.firestore.CACHE_SIZE_UNLIMITED
+        };
+        
+        window.db.settings(settings);
+        
+        // تمكين التخزين المؤقت
+        window.db.enablePersistence()
+            .catch((err) => {
+                console.log('Firebase persistence error:', err.code);
             });
             
-            // تمكين التخزين المؤقت (Persistence)
-            try {
-                await this.db.enablePersistence({
-                    synchronizeTabs: true
-                });
-                console.log('💾 التخزين المؤقت مفعل');
-            } catch (err) {
-                console.log('⚠️ تعطيل التخزين المؤقت:', err.code);
-            }
-            
-            this.isInitialized = true;
-            console.log('✅ Firebase Manager جاهز');
-            
-            // اختبار الاتصال
-            await this.testConnection();
-            
-            // إرسال حدث نجاح التهيئة
-            this.dispatchReadyEvent();
-            
-        } catch (error) {
-            console.error('❌ خطأ في تهيئة Firebase:', error);
-            this.createMockFirebase();
-        }
+        console.log('✅ Firebase optimized for performance');
+        
+    } catch (error) {
+        console.log('Firebase optimization error:', error);
+    }
+}
+
+// دالة مساعدة للتحقق من اتصال Firebase
+window.checkFirebaseConnection = async function() {
+    if (!window.db) {
+        console.log('Firebase is not initialized');
+        return false;
     }
     
-    async testConnection() {
-        try {
-            console.log('🔗 اختبار اتصال Firestore...');
-            const startTime = Date.now();
-            
-            // اختبار بسيط
-            const snapshot = await this.db.collection('products').limit(1).get();
-            const responseTime = Date.now() - startTime;
-            
-            console.log(`✅ اتصال ناجح: ${snapshot.size} منتج (${responseTime}ms)`);
-            
-            if (snapshot.empty) {
-                console.log('📭 قاعدة البيانات فارغة - جاهزة لإضافة منتجات');
-                return { connected: true, hasData: false };
-            }
-            
-            return { connected: true, hasData: true, count: snapshot.size };
-            
-        } catch (error) {
-            console.log('⚠️ خطأ في الاتصال:', error.message);
-            return { connected: false, error: error.message };
-        }
+    try {
+        const testDoc = await window.db.collection('test').limit(1).get();
+        console.log('Firebase connection test:', testDoc.size > 0 ? 'Connected' : 'No data');
+        return true;
+    } catch (error) {
+        console.error('Firebase connection error:', error);
+        return false;
+    }
+};
+
+// دالة لتحميل المنتجات من Firebase
+window.loadProductsFromFirebase = async function() {
+    if (!window.db) {
+        console.log('Firebase not available, using local data');
+        return null;
     }
     
-    createMockFirebase() {
-        console.log('🔄 إنشاء نسخة وهمية للاختبار...');
-        
-        this.db = {
-            collection: (name) => ({
-                get: () => Promise.resolve({ 
-                    empty: true, 
-                    size: 0, 
-                    forEach: () => {},
-                    docs: []
-                }),
-                doc: (id) => ({
-                    get: () => Promise.resolve({ 
-                        exists: false, 
-                        id: id,
-                        data: () => null 
-                    }),
-                    set: (data) => {
-                        console.log('Mock: إضافة مستند', data);
-                        return Promise.resolve();
-                    },
-                    update: (data) => Promise.resolve(),
-                    delete: () => Promise.resolve(),
-                    onSnapshot: () => () => {}
-                }),
-                add: (data) => {
-                    const mockId = 'mock-' + Date.now();
-                    console.log('Mock: إضافة مستند جديد', data);
-                    return Promise.resolve({ id: mockId });
-                },
-                where: () => ({ 
-                    get: () => Promise.resolve({ empty: true, size: 0, docs: [] }),
-                    onSnapshot: () => () => {}
-                }),
-                orderBy: () => ({ 
-                    get: () => Promise.resolve({ empty: true, size: 0, docs: [] }),
-                    limit: () => ({ get: () => Promise.resolve({ empty: true, size: 0, docs: [] }) })
-                }),
-                limit: (num) => ({ 
-                    get: () => Promise.resolve({ empty: true, size: 0, docs: [] }),
-                    onSnapshot: () => () => {}
-                }),
-                onSnapshot: (callback, errorCallback) => {
-                    callback({ empty: true, size: 0, docs: [] });
-                    return () => {};
-                }
-            }),
-            batch: () => ({
-                set: () => {},
-                update: () => {},
-                delete: () => {},
-                commit: () => Promise.resolve()
-            })
-        };
-        
-        this.auth = {
-            onAuthStateChanged: (callback) => {
-                callback(null);
-                return () => {};
-            },
-            signInWithEmailAndPassword: (email, password) => 
-                Promise.reject(new Error('الوضع التجريبي')),
-            signOut: () => Promise.resolve(),
-            currentUser: null,
-            createUserWithEmailAndPassword: () => 
-                Promise.reject(new Error('الوضع التجريبي'))
-        };
-        
-        console.log('✅ النسخة الوهمية جاهزة للاختبار');
-    }
-    
-    dispatchReadyEvent() {
-        const event = new CustomEvent('firebase:ready', {
-            detail: { 
-                db: this.db, 
-                auth: this.auth, 
-                isInitialized: this.isInitialized 
-            }
+    try {
+        const snapshot = await window.db.collection('products')
+            .where('active', '==', true)
+            .orderBy('createdAt', 'desc')
+            .limit(50)
+            .get();
+            
+        const products = [];
+        snapshot.forEach(doc => {
+            const product = doc.data();
+            product.id = doc.id;
+            products.push(product);
         });
-        document.dispatchEvent(event);
+        
+        console.log(`✅ Loaded ${products.length} products from Firebase`);
+        return products;
+        
+    } catch (error) {
+        console.error('Error loading products from Firebase:', error);
+        return null;
     }
+};
+
+// تهيئة المنتجات عند تحميل الصفحة
+document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(() => {
+        if (window.db && window.app) {
+            console.log('🔄 Loading products from Firebase...');
+            
+            window.loadProductsFromFirebase()
+                .then(products => {
+                    if (products && products.length > 0) {
+                        console.log('Products loaded, updating app...');
+                        // يمكن تحديث التطبيق بالمنتجات هنا
+                    }
+                })
+                .catch(error => {
+                    console.error('Failed to load products:', error);
+                });
+        }
+    }, 2000);
+});
+
+// إضافة دالة لتحديث المخزون
+window.updateProductStock = async function(productId, quantityChange) {
+    if (!window.db) return false;
     
-    // دالة لاستيراد المنتجات التجريبية
-    async seedSampleProducts() {
-        if (!this.isInitialized) {
-            console.error('Firebase غير مهيأ');
+    try {
+        const productRef = window.db.collection('products').doc(productId);
+        const productDoc = await productRef.get();
+        
+        if (!productDoc.exists) {
+            console.error('Product not found:', productId);
             return false;
         }
         
-        const sampleProducts = [
-            {
-                name: "آيفون 14 برو",
-                price: 4499,
-                category: "electronics",
-                image: "📱",
-                description: "هاتف أيفون 14 برو بمواصفات متطورة",
-                rating: 4.7,
-                stock: 15,
-                badge: "جديد",
-                createdAt: firebase.firestore.FieldValue.serverTimestamp()
-            },
-            {
-                name: "سماعات لاسلكية",
-                price: 299,
-                category: "electronics",
-                image: "🎧",
-                description: "سماعات بلوتوث عالية الجودة",
-                rating: 4.5,
-                stock: 30,
-                badge: "الأكثر مبيعاً",
-                createdAt: firebase.firestore.FieldValue.serverTimestamp()
-            },
-            {
-                name: "ساعة يد فاخرة",
-                price: 599,
-                category: "accessories",
-                image: "⌚",
-                description: "ساعة يد أنيقة بتصميم عصري",
-                rating: 4.3,
-                stock: 20,
-                badge: "جديد",
-                createdAt: firebase.firestore.FieldValue.serverTimestamp()
-            },
-            {
-                name: "مجموعة تجميل",
-                price: 199,
-                category: "cosmetics",
-                image: "💄",
-                description: "مجموعة متكاملة من مستحضرات التجميل",
-                rating: 4.6,
-                stock: 40,
-                createdAt: firebase.firestore.FieldValue.serverTimestamp()
-            },
-            {
-                name: "حذاء رياضي",
-                price: 249,
-                category: "clothing",
-                image: "👟",
-                description: "حذاء رياضي مريح للجري",
-                rating: 4.4,
-                stock: 25,
-                createdAt: firebase.firestore.FieldValue.serverTimestamp()
-            },
-            {
-                name: "سجادة صوف",
-                price: 399,
-                category: "home",
-                image: "🧶",
-                description: "سجادة صوف طبيعي بتصميم شرقي",
-                rating: 4.2,
-                stock: 18,
-                badge: "خصم",
-                createdAt: firebase.firestore.FieldValue.serverTimestamp()
-            }
-        ];
+        const currentStock = productDoc.data().stock || 0;
+        const newStock = Math.max(0, currentStock + quantityChange);
         
-        try {
-            console.log('🌱 جاري إضافة المنتجات التجريبية...');
-            
-            const batch = this.db.batch();
-            const productsRef = this.db.collection('products');
-            
-            sampleProducts.forEach(product => {
-                const docRef = productsRef.doc();
-                batch.set(docRef, product);
-            });
-            
-            await batch.commit();
-            console.log(`✅ تم إضافة ${sampleProducts.length} منتج بنجاح`);
-            return true;
-            
-        } catch (error) {
-            console.error('❌ خطأ في إضافة المنتجات:', error);
-            return false;
-        }
+        await productRef.update({
+            stock: newStock,
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        
+        console.log(`✅ Updated stock for ${productId}: ${currentStock} → ${newStock}`);
+        return true;
+        
+    } catch (error) {
+        console.error('Error updating stock:', error);
+        return false;
     }
-    
-    // الحصول على جميع المنتجات
-    async getAllProducts() {
-        try {
-            const snapshot = await this.db.collection('products').get();
-            const products = [];
-            
-            snapshot.forEach(doc => {
-                products.push({
-                    id: doc.id,
-                    ...doc.data()
-                });
-            });
-            
-            return products;
-        } catch (error) {
-            console.error('خطأ في جلب المنتجات:', error);
-            return [];
-        }
-    }
-    
-    // الحصول على المنتجات حسب الفئة
-    async getProductsByCategory(category) {
-        try {
-            const snapshot = await this.db.collection('products')
-                .where('category', '==', category)
-                .get();
-            
-            const products = [];
-            snapshot.forEach(doc => {
-                products.push({
-                    id: doc.id,
-                    ...doc.data()
-                });
-            });
-            
-            return products;
-        } catch (error) {
-            console.error(`خطأ في جلب منتجات الفئة ${category}:`, error);
-            return [];
-        }
-    }
-    
-    // إضافة منتج جديد
-    async addProduct(productData) {
-        try {
-            const docRef = await this.db.collection('products').add({
-                ...productData,
-                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-            });
-            
-            console.log('✅ تم إضافة المنتج:', docRef.id);
-            return { success: true, id: docRef.id };
-        } catch (error) {
-            console.error('❌ خطأ في إضافة المنتج:', error);
-            return { success: false, error: error.message };
-        }
-    }
-    
-    // تحديث منتج
-    async updateProduct(productId, updates) {
-        try {
-            await this.db.collection('products').doc(productId).update({
-                ...updates,
-                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-            });
-            
-            console.log('✅ تم تحديث المنتج:', productId);
-            return { success: true };
-        } catch (error) {
-            console.error('❌ خطأ في تحديث المنتج:', error);
-            return { success: false, error: error.message };
-        }
-    }
-    
-    // حذف منتج
-    async deleteProduct(productId) {
-        try {
-            await this.db.collection('products').doc(productId).delete();
-            console.log('✅ تم حذف المنتج:', productId);
-            return { success: true };
-        } catch (error) {
-            console.error('❌ خطأ في حذف المنتج:', error);
-            return { success: false, error: error.message };
-        }
-    }
-}
+};
 
-// إنشاء نسخة واحدة من FirebaseManager
-let firebaseManagerInstance = null;
-
-function getFirebaseManager() {
-    if (!firebaseManagerInstance) {
-        firebaseManagerInstance = new FirebaseManager();
+// دالة لحفظ الطلبات في Firebase
+window.saveOrderToFirebase = async function(orderData) {
+    if (!window.db) {
+        console.log('Firebase not available, saving locally');
+        return null;
     }
-    return firebaseManagerInstance;
-}
+    
+    try {
+        const orderRef = await window.db.collection('orders').add({
+            ...orderData,
+            status: 'pending',
+            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        
+        console.log('✅ Order saved to Firebase with ID:', orderRef.id);
+        return orderRef.id;
+        
+    } catch (error) {
+        console.error('Error saving order to Firebase:', error);
+        return null;
+    }
+};
 
-// التصدير للاستخدام العالمي
-window.firebaseManager = getFirebaseManager();
-window.db = () => getFirebaseManager().db;
-window.auth = () => getFirebaseManager().auth;
+// دالة لتحميل آخر الطلبات
+window.getRecentOrders = async function(limit = 10) {
+    if (!window.db) return [];
+    
+    try {
+        const snapshot = await window.db.collection('orders')
+            .orderBy('createdAt', 'desc')
+            .limit(limit)
+            .get();
+            
+        const orders = [];
+        snapshot.forEach(doc => {
+            const order = doc.data();
+            order.id = doc.id;
+            orders.push(order);
+        });
+        
+        return orders;
+        
+    } catch (error) {
+        console.error('Error loading orders:', error);
+        return [];
+    }
+};
 
-console.log('✅ firebase-init.js جاهز');
+console.log('✅ firebase-init.js loaded');
