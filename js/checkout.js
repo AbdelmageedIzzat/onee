@@ -20,6 +20,11 @@ class CheckoutManager {
         this.orderNotes = document.getElementById('order-notes');
         this.agreeTerms = document.getElementById('agree-terms');
         
+        // تحسينات للأداء
+        this.isProcessing = false;
+        this.lastOrderTime = 0;
+        this.orderCooldown = 3000; // 3 ثواني بين الطلبات
+        
         this.init();
     }
     
@@ -53,12 +58,6 @@ class CheckoutManager {
                 name: 'بطاقة مدى',
                 icon: 'fas fa-credit-card',
                 description: 'الدفع ببطاقة مدى'
-            },
-            {
-                id: 'fawry',
-                name: 'فوري',
-                icon: 'fas fa-bolt',
-                description: 'الدفع عبر تطبيق فوري'
             }
         ];
         
@@ -128,13 +127,51 @@ class CheckoutManager {
             this.customerPhone.addEventListener('input', (e) => {
                 this.validatePhoneInput(e.target);
             });
+            
+            // إضافة placeholder توضيحي
+            this.customerPhone.placeholder = "05xxxxxxxx";
         }
+        
+        // تحسينات للهاتف
+        this.setupMobileOptimizations();
+    }
+    
+    setupMobileOptimizations() {
+        // تحسينات لحقول الإدخال على الهاتف
+        const inputs = [
+            this.customerName,
+            this.customerPhone,
+            this.deliveryAddress,
+            this.orderNotes
+        ];
+        
+        inputs.forEach(input => {
+            if (input) {
+                // منع التكبير في iOS
+                input.addEventListener('focus', () => {
+                    if (/iPhone|iPad|iPod/.test(navigator.userAgent)) {
+                        input.style.fontSize = '16px';
+                    }
+                });
+                
+                // تحسين اللمس
+                input.style.minHeight = '44px';
+            }
+        });
     }
     
     // فتح نافذة الدفع
     openCheckoutModal() {
         if (!window.cartManager || window.cartManager.cart.length === 0) {
             this.showNotification('السلة فارغة', 'أضف منتجات إلى السلة أولاً', 'error');
+            return;
+        }
+        
+        // التحقق من تبريد الطلبات
+        const now = Date.now();
+        if (now - this.lastOrderTime < this.orderCooldown && this.lastOrderTime > 0) {
+            const remaining = Math.ceil((this.orderCooldown - (now - this.lastOrderTime)) / 1000);
+            this.showNotification('يرجى الانتظار', `يمكنك إرسال طلب جديد بعد ${remaining} ثانية`, 'warning');
             return;
         }
         
@@ -147,6 +184,13 @@ class CheckoutManager {
             this.modal.classList.add('visible');
         }, 10);
         
+        // التركيز على أول حقل
+        setTimeout(() => {
+            if (this.customerName) {
+                this.customerName.focus();
+            }
+        }, 300);
+        
         console.log('📄 فتح نافذة الدفع');
     }
     
@@ -156,6 +200,11 @@ class CheckoutManager {
         setTimeout(() => {
             this.modal.classList.remove('active');
             document.body.classList.remove('modal-open');
+            
+            // مسح النموذج
+            if (this.checkoutForm) {
+                this.checkoutForm.reset();
+            }
         }, 300);
     }
     
@@ -204,12 +253,18 @@ class CheckoutManager {
     
     // معالجة الطلب
     async processOrder() {
+        if (this.isProcessing) {
+            this.showNotification('جاري المعالجة', 'يرجى الانتظار حتى اكتمال الطلب السابق', 'warning');
+            return;
+        }
+        
         if (!this.validateForm()) return;
         
         const submitBtn = this.submitOrderBtn;
         const originalText = submitBtn.innerHTML;
         
         // تعطيل الزر أثناء المعالجة
+        this.isProcessing = true;
         submitBtn.disabled = true;
         submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري معالجة الطلب...';
         
@@ -225,17 +280,28 @@ class CheckoutManager {
             // حفظ الطلب محلياً
             this.saveOrderLocally(orderData);
             
+            // حفظ وقت الطلب الأخير
+            this.lastOrderTime = Date.now();
+            
             // عرض تأكيد الطلب النهائي
             this.showFinalConfirmation(orderData);
             
             // إغلاق نافذة الدفع
             this.closeModal();
             
+            // إفراغ السلة بعد ثانية (للسماح للمستخدم برؤية التأكيد)
+            setTimeout(() => {
+                if (window.cartManager) {
+                    window.cartManager.clearCart();
+                }
+            }, 1000);
+            
         } catch (error) {
             console.error('❌ خطأ في معالجة الطلب:', error);
             this.showNotification('خطأ', error.message || 'حدث خطأ أثناء معالجة الطلب', 'error');
         } finally {
             // إعادة تمكين الزر
+            this.isProcessing = false;
             submitBtn.disabled = false;
             submitBtn.innerHTML = originalText;
         }
@@ -260,7 +326,13 @@ class CheckoutManager {
             notes: this.orderNotes?.value.trim() || '',
             
             // المنتجات
-            items: cartDetails.items,
+            items: cartDetails.items.map(item => ({
+                id: item.id,
+                name: item.name,
+                price: item.price,
+                quantity: item.quantity,
+                total: item.total
+            })),
             
             // الأسعار
             subtotal: cartDetails.subtotal,
@@ -271,7 +343,8 @@ class CheckoutManager {
             // معلومات إضافية
             orderId: this.generateOrderId(),
             date: new Date().toLocaleString('ar-SA'),
-            timestamp: new Date().getTime()
+            timestamp: new Date().getTime(),
+            status: 'pending'
         };
     }
     
@@ -283,6 +356,11 @@ class CheckoutManager {
         // التحقق من الاسم
         if (!this.customerName?.value.trim()) {
             errorMessage = 'الرجاء إدخال الاسم الكامل';
+            this.customerName?.focus();
+            isValid = false;
+        }
+        else if (this.customerName.value.trim().length < 2) {
+            errorMessage = 'الاسم قصير جداً (حرفين على الأقل)';
             this.customerName?.focus();
             isValid = false;
         }
@@ -386,7 +464,7 @@ class CheckoutManager {
             <div class="final-confirmation-content">
                 <div class="confirmation-header">
                     <i class="fas fa-check-circle"></i>
-                    <h3>تأكيد الطلب النهائي</h3>
+                    <h3>تم تأكيد طلبك بنجاح!</h3>
                 </div>
                 
                 <div class="confirmation-body">
@@ -433,8 +511,8 @@ class CheckoutManager {
                         <i class="fab fa-whatsapp"></i>
                         إرسال عبر الواتساب
                     </button>
-                    <button class="btn-secondary edit-order" onclick="checkoutManager.editOrder()">
-                        تعديل الطلب
+                    <button class="btn-secondary close-confirmation" onclick="checkoutManager.closeConfirmation()">
+                        إغلاق
                     </button>
                 </div>
             </div>
@@ -509,22 +587,12 @@ class CheckoutManager {
             const whatsappURL = `https://wa.me/${cleanNumber}?text=${encodedMessage}`;
             
             // إغلاق نافذة التأكيد
-            const confirmationModal = document.querySelector('.final-confirmation-modal');
-            if (confirmationModal) {
-                confirmationModal.classList.remove('active');
-                setTimeout(() => confirmationModal.remove(), 300);
-            }
-            
-            // إفراغ السلة
-            window.cartManager?.clearCart();
-            
-            // إظهار رسالة النجاح
-            this.showNotification('نجاح', 'تم إرسال الطلب بنجاح! سيتم التواصل معك قريباً.', 'success');
+            this.closeConfirmation();
             
             // فتح واتساب
             setTimeout(() => {
                 window.open(whatsappURL, '_blank');
-            }, 500);
+            }, 300);
             
         } catch (error) {
             console.error('❌ خطأ في إرسال واتساب:', error);
@@ -532,15 +600,12 @@ class CheckoutManager {
         }
     }
     
-    // تعديل الطلب
-    editOrder() {
+    // إغلاق نافذة التأكيد
+    closeConfirmation() {
         const confirmationModal = document.querySelector('.final-confirmation-modal');
         if (confirmationModal) {
             confirmationModal.classList.remove('active');
-            setTimeout(() => {
-                confirmationModal.remove();
-                this.openCheckoutModal();
-            }, 300);
+            setTimeout(() => confirmationModal.remove(), 300);
         }
     }
     
@@ -549,15 +614,15 @@ class CheckoutManager {
     generateOrderId() {
         const timestamp = Date.now();
         const random = Math.floor(Math.random() * 1000);
-        return `ORD-${timestamp}-${random}`;
+        const prefix = 'NXS';
+        return `${prefix}-${timestamp}-${random}`;
     }
     
     getPaymentMethodName(methodId) {
         const methods = {
             'cash': 'الدفع عند الاستلام',
             'bank': 'تحويل بنكي',
-            'mada': 'بطاقة مدى',
-            'fawry': 'فوري'
+            'mada': 'بطاقة مدى'
         };
         return methods[methodId] || 'غير محدد';
     }
@@ -605,7 +670,33 @@ class CheckoutManager {
         if (window.uiManager?.showNotification) {
             window.uiManager.showNotification(title, message, type);
         } else {
-            alert(`${title}: ${message}`);
+            // Fallback بسيط
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: ${type === 'error' ? '#EF476F' : type === 'success' ? '#06D6A0' : '#118AB2'};
+                color: white;
+                padding: 12px 20px;
+                border-radius: 8px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                z-index: 9999;
+                animation: slideInRight 0.3s ease;
+                font-family: 'Cairo', sans-serif;
+                max-width: 300px;
+            `;
+            notification.innerHTML = `
+                <div style="font-weight: bold; margin-bottom: 4px;">${title}</div>
+                <div style="font-size: 14px;">${message}</div>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.animation = 'slideOutRight 0.3s ease';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
         }
     }
     
@@ -761,6 +852,24 @@ class CheckoutManager {
             .confirmation-footer .btn-secondary:hover {
                 border-color: var(--primary);
                 color: var(--primary);
+            }
+            
+            @media (max-width: 768px) {
+                .final-confirmation-content {
+                    max-width: 100%;
+                }
+                
+                .confirmation-footer {
+                    flex-direction: column;
+                }
+                
+                .confirmation-body {
+                    padding: var(--space-lg);
+                }
+                
+                .order-details {
+                    padding: var(--space-md);
+                }
             }
         `;
         
