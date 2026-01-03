@@ -60,28 +60,6 @@ class UIManager {
                 id: 'quick-view-modal',
                 title: 'عرض سريع',
                 content: '<div id="quick-view-content"></div>'
-            },
-            {
-                id: 'product-detail-modal',
-                title: 'تفاصيل المنتج',
-                content: '<div id="product-detail-content"></div>'
-            },
-            {
-                id: 'discount-modal',
-                title: 'تطبيق كود خصم',
-                content: `
-                    <div class="modal-body">
-                        <div class="form-group">
-                            <label for="discount-code">أدخل كود الخصم</label>
-                            <input type="text" id="discount-code" class="form-control" placeholder="مثال: SUMMER25">
-                        </div>
-                        <div class="discount-info" id="discount-info"></div>
-                    </div>
-                    <div class="modal-footer">
-                        <button class="btn btn-outline" onclick="window.uiManager.closeModal()">إلغاء</button>
-                        <button class="btn btn-primary" onclick="window.uiManager.applyDiscount()">تطبيق</button>
-                    </div>
-                `
             }
         ];
         
@@ -130,6 +108,14 @@ class UIManager {
             });
             
             searchInput.addEventListener('input', (e) => {
+                this.handleSearchInput(e.target.value);
+            });
+        }
+        
+        // تهيئة البحث على الموبايل
+        const mobileSearchInput = document.querySelector('.mobile-search-input input');
+        if (mobileSearchInput) {
+            mobileSearchInput.addEventListener('input', (e) => {
                 this.handleSearchInput(e.target.value);
             });
         }
@@ -386,8 +372,8 @@ class UIManager {
         this.showSearchResults();
         
         // يمكن تنفيذ البحث الفعلي هنا
-        if (window.productsManager) {
-            const results = window.productsManager.searchProducts(query);
+        if (window.app) {
+            const results = window.app.searchProducts(query);
             this.displaySearchResults(results);
         }
     }
@@ -411,8 +397,8 @@ class UIManager {
                 <div class="search-result-image">${product.image}</div>
                 <div class="search-result-info">
                     <div class="search-result-name">${product.name}</div>
-                    <div class="search-result-category">${window.productsManager?.getCategoryName(product.category)}</div>
-                    <div class="search-result-price">${product.price.toFixed(2)} ر.س</div>
+                    <div class="search-result-category">${window.app?.getCategoryName(product.category)}</div>
+                    <div class="search-result-price">${product.price} ر.س</div>
                 </div>
             </div>
         `).join('');
@@ -443,8 +429,11 @@ class UIManager {
         });
         
         // التمرير إلى القسم المناسب
-        if (categoryId === 'all') {
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+        if (categoryId === 'offers') {
+            const offersSection = document.getElementById('special-offers-section');
+            if (offersSection) {
+                offersSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
         } else {
             const section = document.getElementById(`category-${categoryId}`);
             if (section) {
@@ -484,12 +473,6 @@ class UIManager {
             case 'quick-view-modal':
                 this.loadQuickViewData(data);
                 break;
-            case 'product-detail-modal':
-                this.loadProductDetailData(data);
-                break;
-            case 'discount-modal':
-                this.loadDiscountData(data);
-                break;
         }
     }
     
@@ -497,11 +480,7 @@ class UIManager {
         let product = null;
         
         // البحث عن المنتج
-        if (window.productsManager) {
-            product = window.productsManager.getProductById(productId);
-        }
-        
-        if (!product && window.app) {
+        if (window.app) {
             product = window.app.getProductById(productId);
         }
         
@@ -524,11 +503,11 @@ class UIManager {
                         
                         <div style="display: flex; align-items: center; gap: var(--space-md); margin-bottom: var(--space-lg);">
                             <span style="font-size: var(--font-2xl); font-weight: 800; color: var(--primary);">
-                                ${product.price.toFixed(2)} ر.س
+                                ${product.price} ر.س
                             </span>
                             ${product.oldPrice ? `
                                 <span style="text-decoration: line-through; color: var(--text-light);">
-                                    ${product.oldPrice.toFixed(2)} ر.س
+                                    ${product.oldPrice} ر.س
                                 </span>
                             ` : ''}
                         </div>
@@ -538,10 +517,6 @@ class UIManager {
                                 <i class="fas fa-shopping-cart"></i>
                                 أضف إلى السلة
                             </button>
-                            <button class="btn btn-outline" onclick="window.uiManager.openModal('product-detail-modal', '${product.id}')">
-                                <i class="fas fa-info-circle"></i>
-                                تفاصيل كاملة
-                            </button>
                         </div>
                     </div>
                 </div>
@@ -549,62 +524,8 @@ class UIManager {
         }
     }
     
-    loadProductDetailData(productId) {
-        // تفاصيل المنتج الكاملة
-        const product = window.productsManager?.getProductById(productId) || 
-                       window.app?.getProductById(productId);
-        if (!product) return;
-        
-        const content = document.getElementById('product-detail-content');
-        if (content) {
-            content.innerHTML = `
-                <div class="product-detail">
-                    <h3>${product.name}</h3>
-                    <p>${product.description}</p>
-                    <!-- إضافة المزيد من التفاصيل -->
-                </div>
-            `;
-        }
-    }
-    
-    loadDiscountData() {
-        // عرض معلومات أكواد الخصم المتاحة
-        const info = document.getElementById('discount-info');
-        if (info && window.cartManager) {
-            const discounts = window.cartManager.discounts;
-            info.innerHTML = `
-                <div style="margin-top: var(--space-md);">
-                    <h4 style="margin-bottom: var(--space-sm); font-size: var(--font-sm);">أكواد الخصم المتاحة:</h4>
-                    ${Object.entries(discounts).map(([code, details]) => `
-                        <div style="background: var(--light); padding: var(--space-sm); border-radius: var(--radius); margin-bottom: var(--space-sm);">
-                            <div style="font-weight: 600; color: var(--primary);">${code}</div>
-                            <div style="font-size: var(--font-xs); color: var(--text-light);">
-                                خصم ${details.percent}% - الحد الأدنى ${details.minAmount} ر.س
-                            </div>
-                        </div>
-                    `).join('')}
-                </div>
-            `;
-        }
-    }
-    
-    applyDiscount() {
-        const codeInput = document.getElementById('discount-code');
-        if (codeInput && window.cartManager) {
-            const success = window.cartManager.applyDiscount(codeInput.value);
-            if (success) {
-                this.closeModal();
-                codeInput.value = '';
-            }
-        }
-    }
-    
     showProductQuickView(productId) {
         this.openModal('quick-view-modal', productId);
-    }
-    
-    showDiscountModal() {
-        this.openModal('discount-modal');
     }
     
     // تحسين تجربة المستخدم على الموبايل
