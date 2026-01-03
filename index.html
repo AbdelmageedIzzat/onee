@@ -10,7 +10,7 @@
     <!-- Fonts & Icons -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <!-- CSS Files -->
@@ -70,6 +70,23 @@
             transition: width 0.3s ease;
         }
         
+        /* Mobile Search Button */
+        .mobile-search-btn {
+            display: none;
+            background: transparent;
+            border: none;
+            color: var(--text);
+            font-size: var(--icon-lg);
+            padding: var(--space-sm);
+            cursor: pointer;
+        }
+        
+        @media (max-width: 768px) {
+            .mobile-search-btn {
+                display: block;
+            }
+        }
+        
         /* أنيميشن التحميل */
         @keyframes float {
             0%, 100% { transform: translateY(0); }
@@ -112,33 +129,44 @@
                     </div>
                 </div>
 
+                <!-- Mobile Search Button -->
+                <button class="mobile-search-btn" id="mobile-search-btn">
+                    <i class="fas fa-search"></i>
+                </button>
+
                 <!-- Actions -->
                 <div class="header-actions">
-                    <!-- Wishlist -->
-                    <button class="btn btn-icon" id="wishlist-btn" title="المفضلة">
-                        <i class="far fa-heart"></i>
-                    </button>
-                    
                     <!-- Cart -->
                     <button class="cart-button" id="cart-btn">
                         <i class="fas fa-shopping-bag"></i>
                         <span class="cart-count" id="cart-count">0</span>
                     </button>
-                    
-                    <!-- User -->
-                    <button class="btn btn-icon" id="user-btn" title="حسابي">
-                        <i class="far fa-user"></i>
-                    </button>
                 </div>
             </div>
         </header>
 
+        <!-- Mobile Search Overlay -->
+        <div class="mobile-search-overlay" id="mobile-search-overlay">
+            <div class="mobile-search-container">
+                <div class="mobile-search-header">
+                    <button class="mobile-search-close" id="mobile-search-close">
+                        <i class="fas fa-times"></i>
+                    </button>
+                    <h3>بحث</h3>
+                </div>
+                <div class="mobile-search-input">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="ابحث عن منتج...">
+                </div>
+            </div>
+        </div>
+
         <!-- Categories Navigation -->
         <nav class="categories-nav">
             <div class="container categories-container scrollbar-thin">
-                <button class="category-btn active" data-category="all">
-                    <i class="fas fa-fire"></i>
-                    <span>الأكثر مبيعاً</span>
+                <button class="category-btn active" data-category="offers">
+                    <i class="fas fa-tags"></i>
+                    <span>عروض خاصة</span>
                 </button>
                 
                 <button class="category-btn" data-category="electronics">
@@ -175,16 +203,21 @@
                     <i class="fas fa-gamepad"></i>
                     <span>ألعاب</span>
                 </button>
-                
-                <button class="category-btn" data-category="offers">
-                    <i class="fas fa-tags"></i>
-                    <span>عروض خاصة</span>
-                </button>
             </div>
         </nav>
 
         <!-- Main Content -->
         <main class="main-content">
+            <!-- Special Offers -->
+            <section class="section offers-section" id="special-offers-section">
+                <div class="container">
+                    <h2 class="section-title">عروض اليوم الحصرية</h2>
+                    <div class="offers-slider" id="special-offers">
+                        <!-- سيتم تحميل العروض هنا -->
+                    </div>
+                </div>
+            </section>
+
             <!-- Hero Section -->
             <section class="hero-section">
                 <div class="container">
@@ -192,13 +225,9 @@
                         <h1 class="hero-title">تجربة تسوق استثنائية</h1>
                         <p class="hero-subtitle">اكتشف آلاف المنتجات بأسعار تنافسية مع توصيل سريع وآمن</p>
                         <div class="hero-buttons">
-                            <button class="btn btn-secondary btn-lg" onclick="window.app.switchCategory('all')">
+                            <button class="btn btn-secondary btn-lg" onclick="window.app.switchCategory('offers')">
                                 <i class="fas fa-shopping-cart"></i>
                                 ابدأ التسوق الآن
-                            </button>
-                            <button class="btn btn-outline btn-lg" style="color: white; border-color: white;">
-                                <i class="fas fa-play-circle"></i>
-                                شاهد الفيديو
                             </button>
                         </div>
                     </div>
@@ -249,16 +278,6 @@
             <div id="category-sections">
                 <!-- سيتم تحميل المنتجات هنا ديناميكياً -->
             </div>
-
-            <!-- Special Offers -->
-            <section class="section offers-section">
-                <div class="container">
-                    <h2 class="section-title">عروض اليوم</h2>
-                    <div class="offers-slider" id="special-offers">
-                        <!-- سيتم تحميل العروض هنا -->
-                    </div>
-                </div>
-            </section>
         </main>
 
         <!-- Footer -->
@@ -283,7 +302,6 @@
                             <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
                             <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
                             <a href="#" class="social-link"><i class="fab fa-whatsapp"></i></a>
-                            <a href="#" class="social-link"><i class="fab fa-youtube"></i></a>
                         </div>
                     </div>
 
@@ -295,7 +313,6 @@
                             <a href="#"><i class="fas fa-chevron-left"></i> جميع المنتجات</a>
                             <a href="#"><i class="fas fa-chevron-left"></i> العروض الخاصة</a>
                             <a href="#"><i class="fas fa-chevron-left"></i> المنتجات الجديدة</a>
-                            <a href="#"><i class="fas fa-chevron-left"></i> الأكثر مبيعاً</a>
                             <a href="#"><i class="fas fa-chevron-left"></i> المدونة</a>
                         </div>
                     </div>
@@ -309,7 +326,6 @@
                             <a href="#" onclick="window.app.switchCategory('beauty')"><i class="fas fa-chevron-left"></i> جمال</a>
                             <a href="#" onclick="window.app.switchCategory('home')"><i class="fas fa-chevron-left"></i> منزلية</a>
                             <a href="#" onclick="window.app.switchCategory('sports')"><i class="fas fa-chevron-left"></i> رياضة</a>
-                            <a href="#" onclick="window.app.switchCategory('books')"><i class="fas fa-chevron-left"></i> كتب</a>
                         </div>
                     </div>
 
@@ -504,19 +520,16 @@
 
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 
     <!-- JS Files (Order is important) -->
     <script src="js/firebase-config.js"></script>
     <script src="js/firebase-init.js"></script>
     <script src="js/utilities.js"></script>
-    <script src="js/products-manager.js"></script>
     <script src="js/app.js"></script>
     <script src="js/cart.js"></script>
     <script src="js/ui.js"></script>
     <script src="js/checkout.js"></script>
-    <script src="js/search.js"></script>
     
     <script>
         // Loader
@@ -539,6 +552,27 @@
                     }, 300);
                 }
             }, 100);
+            
+            // Mobile search functionality
+            const mobileSearchBtn = document.getElementById('mobile-search-btn');
+            const mobileSearchOverlay = document.getElementById('mobile-search-overlay');
+            const mobileSearchClose = document.getElementById('mobile-search-close');
+            
+            if (mobileSearchBtn && mobileSearchOverlay) {
+                mobileSearchBtn.addEventListener('click', function() {
+                    mobileSearchOverlay.style.display = 'block';
+                    setTimeout(() => {
+                        mobileSearchOverlay.classList.add('active');
+                    }, 10);
+                });
+                
+                mobileSearchClose.addEventListener('click', function() {
+                    mobileSearchOverlay.classList.remove('active');
+                    setTimeout(() => {
+                        mobileSearchOverlay.style.display = 'none';
+                    }, 300);
+                });
+            }
         });
     </script>
 </body>
