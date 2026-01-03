@@ -4,18 +4,17 @@ console.log('🚀 Nexus Store - Starting...');
 
 class NexusStore {
     constructor() {
-        this.currentCategory = 'all';
+        this.currentCategory = 'offers'; // تغيير الفئة الافتراضية إلى العروض
         this.products = {};
         this.categories = [
-            { id: 'all', name: 'الكل', icon: 'fas fa-fire', color: '#FF6B8B' },
+            { id: 'offers', name: 'عروض خاصة', icon: 'fas fa-tags', color: '#EF476F' },
             { id: 'electronics', name: 'إلكترونيات', icon: 'fas fa-laptop', color: '#4361EE' },
             { id: 'fashion', name: 'أزياء', icon: 'fas fa-tshirt', color: '#F72585' },
             { id: 'home', name: 'منزلية', icon: 'fas fa-home', color: '#4CC9F0' },
             { id: 'beauty', name: 'جمال', icon: 'fas fa-spa', color: '#7209B7' },
             { id: 'sports', name: 'رياضة', icon: 'fas fa-futbol', color: '#06D6A0' },
             { id: 'books', name: 'كتب', icon: 'fas fa-book', color: '#FB5607' },
-            { id: 'toys', name: 'ألعاب', icon: 'fas fa-gamepad', color: '#FFD166' },
-            { id: 'offers', name: 'عروض خاصة', icon: 'fas fa-tags', color: '#EF476F' }
+            { id: 'toys', name: 'ألعاب', icon: 'fas fa-gamepad', color: '#FFD166' }
         ];
         
         this.init();
@@ -41,20 +40,12 @@ class NexusStore {
     
     async initComponents() {
         // Initialize managers if they exist
-        if (typeof ProductsManager !== 'undefined') {
-            window.productsManager = new ProductsManager();
-        }
-        
         if (typeof CartManager !== 'undefined') {
             window.cartManager = new CartManager();
         }
         
         if (typeof UIManager !== 'undefined') {
             window.uiManager = new UIManager();
-        }
-        
-        if (typeof SearchManager !== 'undefined') {
-            window.searchManager = new SearchManager();
         }
         
         if (typeof CheckoutManager !== 'undefined') {
@@ -70,7 +61,7 @@ class NexusStore {
             // Load products
             await this.loadProducts();
             
-            // Load special offers
+            // Load special offers FIRST
             await this.loadSpecialOffers();
             
             // Update UI
@@ -120,46 +111,47 @@ class NexusStore {
     }
     
     loadLocalProducts() {
-        // Sample products data
+        // Sample products data - بدون تقييمات
         this.products = {
             electronics: [
-                { id: 'elec1', name: 'سماعات لاسلكية', price: 299, image: '🎧', description: 'سماعات بلوتوث عالية الجودة', category: 'electronics', rating: 4.5, badge: 'الأكثر مبيعاً' },
-                { id: 'elec2', name: 'ساعة ذكية', price: 499, image: '⌚', description: 'ساعة ذكية متطورة', category: 'electronics', rating: 4.3, badge: 'جديد' },
-                { id: 'elec3', name: 'لابتوب محمول', price: 3499, image: '💻', description: 'لابتوب بمواصفات عالية', category: 'electronics', rating: 4.7, badge: 'الأكثر مبيعاً' },
-                { id: 'elec4', name: 'كاميرا ديجيتال', price: 1299, image: '📷', description: 'كاميرا احترافية', category: 'electronics', rating: 4.6 }
+                { id: 'elec1', name: 'سماعات لاسلكية', price: 299, image: '🎧', description: 'سماعات بلوتوث عالية الجودة', category: 'electronics', badge: 'الأكثر مبيعاً' },
+                { id: 'elec2', name: 'ساعة ذكية', price: 499, image: '⌚', description: 'ساعة ذكية متطورة', category: 'electronics', badge: 'جديد' },
+                { id: 'elec3', name: 'لابتوب محمول', price: 3499, image: '💻', description: 'لابتوب بمواصفات عالية', category: 'electronics', badge: 'الأكثر مبيعاً' },
+                { id: 'elec4', name: 'كاميرا ديجيتال', price: 1299, image: '📷', description: 'كاميرا احترافية', category: 'electronics' }
             ],
             fashion: [
-                { id: 'fash1', name: 'قميص رجالي', price: 89, image: '👔', description: 'قميص قطني عالي الجودة', category: 'fashion', rating: 4.2 },
-                { id: 'fash2', name: 'فستان سهرة', price: 299, image: '👗', description: 'فستان أنيق للمناسبات', category: 'fashion', rating: 4.7, badge: 'الأكثر مبيعاً' },
-                { id: 'fash3', name: 'حذاء رياضي', price: 199, image: '👟', description: 'حذاء رياضي مريح', category: 'fashion', rating: 4.4 },
-                { id: 'fash4', name: 'حقيبة يد', price: 149, image: '👜', description: 'حقيبة يد أنيقة', category: 'fashion', rating: 4.3 }
+                { id: 'fash1', name: 'قميص رجالي', price: 89, image: '👔', description: 'قميص قطني عالي الجودة', category: 'fashion' },
+                { id: 'fash2', name: 'فستان سهرة', price: 299, image: '👗', description: 'فستان أنيق للمناسبات', category: 'fashion', badge: 'الأكثر مبيعاً' },
+                { id: 'fash3', name: 'حذاء رياضي', price: 199, image: '👟', description: 'حذاء رياضي مريح', category: 'fashion' },
+                { id: 'fash4', name: 'حقيبة يد', price: 149, image: '👜', description: 'حقيبة يد أنيقة', category: 'fashion' }
             ],
             home: [
-                { id: 'home1', name: 'سجادة صوف', price: 199, image: '🧶', description: 'سجادة صوف طبيعي', category: 'home', rating: 4.4 },
-                { id: 'home2', name: 'مصباح طاولة', price: 149, image: '💡', description: 'مصباح LED عصري', category: 'home', rating: 4.1 },
-                { id: 'home3', name: 'طقم أطباق', price: 179, image: '🍽️', description: 'طقم أطباق سيراميك', category: 'home', rating: 4.5 },
-                { id: 'home4', name: 'مفرش طاولة', price: 89, image: '🧵', description: 'مفرش طاولة قطني', category: 'home', rating: 4.2 }
+                { id: 'home1', name: 'سجادة صوف', price: 199, image: '🧶', description: 'سجادة صوف طبيعي', category: 'home' },
+                { id: 'home2', name: 'مصباح طاولة', price: 149, image: '💡', description: 'مصباح LED عصري', category: 'home' },
+                { id: 'home3', name: 'طقم أطباق', price: 179, image: '🍽️', description: 'طقم أطباق سيراميك', category: 'home' },
+                { id: 'home4', name: 'مفرش طاولة', price: 89, image: '🧵', description: 'مفرش طاولة قطني', category: 'home' }
             ],
             beauty: [
-                { id: 'beauty1', name: 'مجموعة تجميل', price: 179, image: '💄', description: 'مجموعة كاملة من مستحضرات التجميل', category: 'beauty', rating: 4.6, badge: 'خصم' },
-                { id: 'beauty2', name: 'عطر نسائي', price: 249, image: '🌸', description: 'عطر برائحة مميزة', category: 'beauty', rating: 4.7 },
-                { id: 'beauty3', name: 'كريم ترطيب', price: 99, image: '🧴', description: 'كريم ترطيب للبشرة', category: 'beauty', rating: 4.4 }
+                { id: 'beauty1', name: 'مجموعة تجميل', price: 179, image: '💄', description: 'مجموعة كاملة من مستحضرات التجميل', category: 'beauty', badge: 'خصم' },
+                { id: 'beauty2', name: 'عطر نسائي', price: 249, image: '🌸', description: 'عطر برائحة مميزة', category: 'beauty' },
+                { id: 'beauty3', name: 'كريم ترطيب', price: 99, image: '🧴', description: 'كريم ترطيب للبشرة', category: 'beauty' }
             ],
             sports: [
-                { id: 'sport1', name: 'كرة قدم', price: 129, image: '⚽', description: 'كرة قدم احترافية', category: 'sports', rating: 4.5 },
-                { id: 'sport2', name: 'حذاء جري', price: 299, image: '👟', description: 'حذاء جري رياضي', category: 'sports', rating: 4.6 }
+                { id: 'sport1', name: 'كرة قدم', price: 129, image: '⚽', description: 'كرة قدم احترافية', category: 'sports' },
+                { id: 'sport2', name: 'حذاء جري', price: 299, image: '👟', description: 'حذاء جري رياضي', category: 'sports' }
             ],
             books: [
-                { id: 'book1', name: 'رواية عالمية', price: 49, image: '📚', description: 'رواية أدبية مشهورة', category: 'books', rating: 4.7 },
-                { id: 'book2', name: 'كتاب تطوير الذات', price: 59, image: '📖', description: 'كتاب في التنمية البشرية', category: 'books', rating: 4.4 }
+                { id: 'book1', name: 'رواية عالمية', price: 49, image: '📚', description: 'رواية أدبية مشهورة', category: 'books' },
+                { id: 'book2', name: 'كتاب تطوير الذات', price: 59, image: '📖', description: 'كتاب في التنمية البشرية', category: 'books' }
             ],
             toys: [
-                { id: 'toy1', name: 'لعبة أطفال', price: 79, image: '🧸', description: 'لعبة تعليمية للأطفال', category: 'toys', rating: 4.5 },
-                { id: 'toy2', name: 'سيارة تحكم', price: 199, image: '🚗', description: 'سيارة تحكم عن بعد', category: 'toys', rating: 4.3 }
+                { id: 'toy1', name: 'لعبة أطفال', price: 79, image: '🧸', description: 'لعبة تعليمية للأطفال', category: 'toys' },
+                { id: 'toy2', name: 'سيارة تحكم', price: 199, image: '🚗', description: 'سيارة تحكم عن بعد', category: 'toys' }
             ],
             offers: [
-                { id: 'offer1', name: 'عرض خاص', price: 249, image: '🔥', description: 'خصم 50% لفترة محدودة', category: 'offers', oldPrice: 499, rating: 4.8, badge: 'خصم 50%' },
-                { id: 'offer2', name: 'تخفيض الصيف', price: 399, image: '🏖️', description: 'عروض الصيف الحصرية', category: 'offers', oldPrice: 599, rating: 4.7, badge: 'خصم 30%' }
+                { id: 'offer1', name: 'عرض خاص', price: 249, image: '🔥', description: 'خصم 50% لفترة محدودة', category: 'offers', oldPrice: 499, badge: 'خصم 50%' },
+                { id: 'offer2', name: 'تخفيض الصيف', price: 399, image: '🏖️', description: 'عروض الصيف الحصرية', category: 'offers', oldPrice: 599, badge: 'خصم 30%' },
+                { id: 'offer3', name: 'عرض نهاية الموسم', price: 199, image: '🎯', description: 'تخفيضات هائلة على جميع المنتجات', category: 'offers', oldPrice: 399, badge: 'خصم 50%' }
             ]
         };
         
@@ -178,7 +170,7 @@ class NexusStore {
         let html = '';
         
         this.categories.forEach(category => {
-            if (category.id === 'all' || category.id === 'offers') return;
+            if (category.id === 'offers') return; // تخطي العروض لأنها تظهر أولاً
             
             const categoryProducts = this.products[category.id] || [];
             if (categoryProducts.length === 0) return;
@@ -198,11 +190,11 @@ class NexusStore {
                             </h2>
                         </div>
                         
-                        <div class="products-grid">
+                        <div class="products-grid compact-grid">
                             ${categoryProducts.map(product => this.renderProductCard(product)).join('')}
                         </div>
                         
-                        ${categoryProducts.length > 8 ? `
+                        ${categoryProducts.length > 4 ? `
                         <div style="text-align: center; margin-top: var(--space-xl);">
                             <button class="btn btn-outline" onclick="app.viewMore('${category.id}')">
                                 <i class="fas fa-eye"></i>
@@ -224,7 +216,6 @@ class NexusStore {
     }
     
     renderProductCard(product) {
-        const ratingStars = this.generateRatingStars(product.rating || 4);
         const discountBadge = product.oldPrice ? 
             `<div class="discount-badge">${Math.round((1 - product.price / product.oldPrice) * 100)}%</div>` : '';
         
@@ -235,43 +226,35 @@ class NexusStore {
         ` : '';
         
         return `
-            <div class="product-card card" data-id="${product.id}">
+            <div class="product-card compact-card card" data-id="${product.id}" onclick="app.expandProductCard(this)">
                 ${discountBadge}
                 ${productBadge}
                 
-                <div class="product-image">
+                <div class="product-image compact-image">
                     ${product.image || '📦'}
                 </div>
                 
-                <div class="product-info">
+                <div class="product-info compact-info">
                     <div class="product-category">
                         <i class="fas fa-tag"></i>
                         ${this.getCategoryName(product.category)}
                     </div>
                     
-                    <h3 class="product-name">${product.name}</h3>
+                    <h3 class="product-name compact-name">${product.name}</h3>
                     
-                    <p class="product-description">${product.description}</p>
+                    <p class="product-description compact-description">${product.description}</p>
                     
-                    <div class="product-rating">
-                        ${ratingStars}
-                        <span class="rating-count">${product.rating || 4.0}</span>
-                    </div>
-                    
-                    <div class="product-price">
+                    <div class="product-price compact-price">
                         <span class="price-current">${product.price} ر.س</span>
                         ${product.oldPrice ? `
                             <span class="price-old">${product.oldPrice} ر.س</span>
                         ` : ''}
                     </div>
                     
-                    <div class="product-actions">
+                    <div class="product-actions compact-actions">
                         <button class="btn btn-primary btn-sm add-to-cart" data-id="${product.id}">
                             <i class="fas fa-shopping-cart"></i>
                             أضف للسلة
-                        </button>
-                        <button class="btn btn-icon btn-outline wishlist-btn" data-id="${product.id}" title="إضافة للمفضلة">
-                            <i class="far fa-heart"></i>
                         </button>
                         <button class="btn btn-icon btn-outline quick-view" data-id="${product.id}" title="عرض سريع">
                             <i class="fas fa-eye"></i>
@@ -282,22 +265,18 @@ class NexusStore {
         `;
     }
     
-    generateRatingStars(rating) {
-        let stars = '';
-        const fullStars = Math.floor(rating);
-        const hasHalfStar = rating % 1 >= 0.5;
+    expandProductCard(card) {
+        // تبديل حالة التوسيع
+        card.classList.toggle('expanded');
         
-        for (let i = 1; i <= 5; i++) {
-            if (i <= fullStars) {
-                stars += '<i class="fas fa-star"></i>';
-            } else if (i === fullStars + 1 && hasHalfStar) {
-                stars += '<i class="fas fa-star-half-alt"></i>';
-            } else {
-                stars += '<i class="far fa-star"></i>';
-            }
+        // إغلاق البطاقات الأخرى المفتوحة
+        if (card.classList.contains('expanded')) {
+            document.querySelectorAll('.product-card.expanded').forEach(otherCard => {
+                if (otherCard !== card) {
+                    otherCard.classList.remove('expanded');
+                }
+            });
         }
-        
-        return `<div class="stars">${stars}</div>`;
     }
     
     getBadgeClass(badge) {
@@ -341,12 +320,10 @@ class NexusStore {
                     <h3 class="offer-title">${offer.name}</h3>
                     <p class="offer-description">${offer.description}</p>
                     
-                    <div class="offer-price" style="margin-bottom: var(--space-lg);">
-                        <span style="font-size: var(--font-3xl); font-weight: 800;">${offer.price} ر.س</span>
+                    <div class="offer-price">
+                        <span class="offer-price-current">${offer.price} ر.س</span>
                         ${offer.oldPrice ? `
-                            <span style="text-decoration: line-through; opacity: 0.7; margin-right: var(--space-sm);">
-                                ${offer.oldPrice} ر.س
-                            </span>
+                            <span class="offer-price-old">${offer.oldPrice} ر.س</span>
                         ` : ''}
                     </div>
                     
@@ -357,7 +334,7 @@ class NexusStore {
                         <div class="timer-unit">ساعة : دقيقة : ثانية</div>
                     </div>
                     
-                    <button class="btn btn-secondary" onclick="app.addToCart('${offer.id}')">
+                    <button class="btn btn-secondary offer-btn" onclick="app.addToCart('${offer.id}')">
                         <i class="fas fa-bolt"></i>
                         احصل على العرض الآن
                     </button>
@@ -379,16 +356,6 @@ class NexusStore {
                 const productId = e.currentTarget.dataset.id;
                 console.log(`🛒 Add to cart clicked for product: ${productId}`);
                 this.addToCart(productId);
-            });
-        });
-        
-        // Wishlist buttons
-        document.querySelectorAll('.wishlist-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                const productId = e.currentTarget.dataset.id;
-                this.toggleWishlist(productId);
             });
         });
         
@@ -420,14 +387,6 @@ class NexusStore {
         } else {
             console.error('❌ cartManager not available');
             alert('نظام السلة غير متاح حالياً. الرجاء المحاولة مرة أخرى.');
-        }
-    }
-    
-    toggleWishlist(productId) {
-        console.log('Toggle wishlist:', productId);
-        // Implement wishlist functionality
-        if (window.uiManager) {
-            window.uiManager.showNotification('قريباً', 'ميزة المفضلة قريباً', 'info');
         }
     }
     
@@ -468,14 +427,17 @@ class NexusStore {
         });
         
         // Scroll to category section
-        if (categoryId !== 'all') {
+        if (categoryId !== 'offers') {
             const section = document.getElementById(`category-${categoryId}`);
             if (section) {
                 section.scrollIntoView({ behavior: 'smooth' });
             }
         } else {
-            // Scroll to top
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            // Scroll to special offers
+            const offersSection = document.getElementById('special-offers-section');
+            if (offersSection) {
+                offersSection.scrollIntoView({ behavior: 'smooth' });
+            }
         }
     }
     
@@ -494,26 +456,6 @@ class NexusStore {
             });
         }
         
-        // Wishlist button
-        const wishlistBtn = document.getElementById('wishlist-btn');
-        if (wishlistBtn) {
-            wishlistBtn.addEventListener('click', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                this.showNotification('قريباً', 'ميزة المفضلة قريباً', 'info');
-            });
-        }
-        
-        // User button
-        const userBtn = document.getElementById('user-btn');
-        if (userBtn) {
-            userBtn.addEventListener('click', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                this.showNotification('قريباً', 'نظام الحسابات قريباً', 'info');
-            });
-        }
-        
         // Search input
         const searchInput = document.getElementById('global-search');
         if (searchInput) {
@@ -526,6 +468,14 @@ class NexusStore {
                 if (results && results.innerHTML.trim()) {
                     results.classList.add('active');
                 }
+            });
+        }
+        
+        // Mobile search
+        const mobileSearchInput = document.querySelector('.mobile-search-input input');
+        if (mobileSearchInput) {
+            mobileSearchInput.addEventListener('input', (e) => {
+                this.handleSearch(e.target.value);
             });
         }
         
@@ -712,8 +662,6 @@ class NexusStore {
             `;
         }
     }
-    
-    // ================ الدوال المضافة لحل مشكلة البحث عن المنتجات ================
     
     /**
      * البحث عن منتج بواسطة ID
